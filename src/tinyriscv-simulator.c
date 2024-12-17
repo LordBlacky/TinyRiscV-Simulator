@@ -237,6 +237,18 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			wR(reg,rd,((uint32_t)rR(reg,rs1) >> (rR(reg,rs2)&31)));
 			pgrm->pc += 4;
 			break;
+		case SLL:
+			wR(reg,rd,(rR(reg,rs1) << (rR(reg,rs2)&31)));
+			pgrm->pc += 4;
+			break;
+		case MUL:
+			wR(reg,rd,(rR(reg,rs1) * rR(reg,rs2)));
+			pgrm->pc += 4;
+			break;
+		case SLLI:
+			wR(reg,rd,(rR(reg,rs1) << rs2));
+			pgrm->pc += 4;
+			break;
 		default:
 			break;
 
