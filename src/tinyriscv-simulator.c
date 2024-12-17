@@ -167,7 +167,7 @@ void freeProgram (Program *pgrm) {
 
 void addCommand (Program *pgrm, int32_t line, CommandType type, int32_t a, int32_t b, int32_t c) {
 
-	if (line < 0 || line > pgrm->size ) {
+	if (line < 0 || line >= pgrm->size ) {
 		printf("ERROR: addCommand - line is not in between 0 / %d / %d\n",line,pgrm->size-1);
 		return;
 	} else {
@@ -221,7 +221,22 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 		case EMPTY:
 			pgrm->pc += 4;
 			break;
-		
+		case SLT:
+			wR(reg,rd,(rR(reg,rs1) < rR(reg,rs2) ? 1 : 0));
+			pgrm->pc += 4;
+			break;
+		case SLTU:
+			wR(reg,rd,((uint32_t)rR(reg,rs1) < (uint32_t)rR(reg,rs2) ? 1 : 0));
+			pgrm->pc += 4;
+			break;
+		case SRA:
+			wR(reg,rd,(rR(reg,rs1) >> (rR(reg,rs2)&31)));
+			pgrm->pc += 4;
+			break;
+		case SRL:
+			wR(reg,rd,((uint32_t)rR(reg,rs1) >> (rR(reg,rs2)&31)));
+			pgrm->pc += 4;
+			break;
 		default:
 			break;
 
