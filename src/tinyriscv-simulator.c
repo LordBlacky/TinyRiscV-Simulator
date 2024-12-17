@@ -53,6 +53,7 @@ Register *createRegister (int32_t size) {
 			return NULL;
 		} else {
 			reg->size = size;
+			(reg->data)[0] = 0;
 		}
 	}
 	return reg;
