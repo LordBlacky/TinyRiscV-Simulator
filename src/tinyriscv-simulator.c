@@ -88,7 +88,7 @@ void wM (Memory *mem, int32_t addr, int32_t data) {
 
 void wR (Register *reg, int32_t addr, int32_t data) {
 
-	if (addr < reg->size && addr > 0) {
+	if (addr < reg->size && addr >= 0) {
 		(reg->data)[addr] = data;
 	} else {
 		printf("ERROR: No valid register address for write access 0 / %d / %d\n",addr,reg->size-1);
@@ -110,7 +110,11 @@ int32_t rM (Memory *mem, int32_t addr) {
 int32_t rR (Register *reg, int32_t addr) {
 
 	if (addr < reg->size && addr >= 0) {
-		return (reg->data)[addr];
+		if (addr == 0) {
+			return 0;
+		} else {
+			return (reg->data)[addr];
+		}
 	} else {
 		printf("ERROR: No valid register address for read access 0 / %d / %d",addr,reg->size-1);
 		return 0;
@@ -336,11 +340,13 @@ int main (int argc, char **argv) {
 	Memory *mem = createMemory(10000);
 	Program *pgrm = createProgram(10000);
 
-	long i = 0;
-	while (1) {
-		if (i++ % 1000000 == 0) {
-			printf("Executing instruction number %ld million\n",i/1000000);
-		}
+	addCommand(pgrm,0,ADDI,1,0,1);
+	addCommand(pgrm,1,ADDI,1,1,2);
+	addCommand(pgrm,2,ADDI,1,1,-2);
+	addCommand(pgrm,3,JAL,0,-8,0);
+
+	int j = 0;
+	while (j++ < 150000000) {
 		executeCommand(getCommand(pgrm),reg,mem,pgrm);
 	}
 
