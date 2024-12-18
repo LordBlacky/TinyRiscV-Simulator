@@ -336,34 +336,22 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 
 }
 
-void printRegister (Register *reg) {
+void printRegister(Register *reg) {
 
-	printf("=========================================================================\n");
+    printf("=====================================================================================\n");
+    printf("CURRENT REGISTER VIEW\n");
+    printf("-------------------------------------------------------------------------------------\n");
 
-	printf("CURRENT REGISTER VIEW\n");
-	
-	printf("-------------------------------------------------------------------------\n");
+    for (int i = 0; i < reg->size; i += 4) {
+        printf("x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n",
+               i, reg->data[i],
+               i + 1, reg->data[i + 1],
+               i + 2, reg->data[i + 2],
+               i + 3, reg->data[i + 3]);
+    }
 
-	printf("x0: %d | x1: %d | x2: %d | x3: %d | x4: %d | x5: %d\n"
-	,reg->data[0],reg->data[1],reg->data[2],reg->data[3],reg->data[4],reg->data[5]);
-	
-	printf("x6: %d | x7: %d | x8: %d | x9: %d | x10: %d | x11: %d\n"
-	,reg->data[6],reg->data[7],reg->data[8],reg->data[9],reg->data[10],reg->data[11]);
-	
-	printf("x12: %d | x13: %d | x14: %d | x15: %d | x16: %d | x17: %d\n"
-	,reg->data[12],reg->data[13],reg->data[14],reg->data[15],reg->data[16],reg->data[17]);
-	
-	printf("x18: %d | x1: %d | x19: %d | x20: %d | x21: %d | x22: %d\n"
-	,reg->data[18],reg->data[19],reg->data[20],reg->data[21],reg->data[22],reg->data[23]);
-	
-	printf("x24: %d | x25: %d | x26: %d | x27: %d | x28: %d | x29: %d\n"
-	,reg->data[24],reg->data[25],reg->data[26],reg->data[27],reg->data[28],reg->data[29]);
-	
-	printf("x30: %d | x31: %d\n"
-	,reg->data[30],reg->data[31]);
-	
-	printf("=========================================================================\n");
-	
+    printf("=====================================================================================\n");
+
 }
 
 int main (int argc, char **argv) {
@@ -373,7 +361,7 @@ int main (int argc, char **argv) {
 	Program *pgrm = createProgram(10000);
 
 	addCommand(pgrm,0,ADDI,1,0,1);
-	addCommand(pgrm,1,ADDI,4,0,200);
+	addCommand(pgrm,1,ADDI,4,0,2147483647);
 	addCommand(pgrm,2,ADDI,1,1,2);
 	addCommand(pgrm,3,BEQ,1,4,-12);
 	addCommand(pgrm,4,ADDI,1,1,-2);
