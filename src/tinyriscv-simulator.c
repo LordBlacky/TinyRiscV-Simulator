@@ -10,11 +10,17 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include<pthread.h>
 
 typedef struct Memory {
 	int32_t *data;
 	int32_t size;
 } Memory;
+
+typedef struct SharedMemory {
+	Memory *mem;
+	pthread_mutex_t mutex;
+} SharedMemory;
 
 typedef struct Register {
 	int32_t *data;
@@ -38,6 +44,21 @@ Memory *createMemory (int32_t size) {
 		}
 	}
 	return mem;
+
+}
+
+SharedMemory *createSharedMemory (int32_t size) {
+
+	SharedMemory *shared = malloc(sizeof(SharedMemory));
+	if (shared == NULL) {
+		printf("ERROR: Cannot allocate shared memory\n");
+		return NULL;
+	} else {
+		Memory *mem = createMemory(size);
+		shared->mem = mem;
+		pthread_mutex_init(&shared->mutex, NULL);
+	}
+	return shared;
 
 }
 
@@ -66,6 +87,14 @@ void freeMemory (Memory *mem) {
 
 	free(mem->data);
 	free(mem);
+
+}
+
+void freeSharedMemory (SharedMemory *shared) {
+
+	freeMemory(shared->mem);
+	pthread_mutex_destroy(&shared->mutex);
+	free(shared);
 
 }
 
@@ -354,28 +383,63 @@ void printRegister(Register *reg) {
 
 }
 
+typedef struct CPU {
+	Register *reg;
+	SharedMemory *shared;
+	Program *pgrm;
+} CPU;
+
+CPU *createCPU () {
+
+	CPU *cpu = malloc(sizeof(CPU));
+	if (cpu == NULL) {
+		printf("ERROR: Failed to allocate cpu\n");
+		return NULL;
+	} else {
+		cpu->reg = createRegister(32);
+		cpu->shared = createSharedMemory(10000);
+		cpu->pgrm = createProgram(10000);
+	}
+	return cpu;
+
+}
+
+void freeCPU (CPU *cpu) {
+
+	freeRegister(cpu->reg);
+	freeSharedMemory(cpu->shared);
+	freeProgram(cpu->pgrm);
+	free(cpu);
+
+}
+
+void runCommand (CPU *cpu) {
+
+	pthread_mutex_lock(&cpu->shared->mutex);
+	executeCommand(getCommand(cpu->pgrm),cpu->reg,cpu->shared->mem,cpu->pgrm);
+	pthread_mutex_unlock(&cpu->shared->mutex);
+
+}
+
 int main (int argc, char **argv) {
 
-	Register *reg = createRegister(32);
-	Memory *mem = createMemory(10000);
-	Program *pgrm = createProgram(10000);
+	CPU *cpu = createCPU();
 
-	addCommand(pgrm,0,ADDI,1,0,1);
-	addCommand(pgrm,1,ADDI,4,0,2147483647);
-	addCommand(pgrm,2,ADDI,1,1,2);
-	addCommand(pgrm,3,BEQ,1,4,-12);
-	addCommand(pgrm,4,ADDI,1,1,-2);
-	addCommand(pgrm,5,JAL,0,-12,0);
+	addCommand(cpu->pgrm,0,ADDI,1,0,1);
+	addCommand(cpu->pgrm,1,ADDI,4,0,2147483647);
+	addCommand(cpu->pgrm,2,ADDI,1,1,2);
+	addCommand(cpu->pgrm,3,BEQ,1,4,-12);
+	addCommand(cpu->pgrm,4,ADDI,1,1,-2);
+	addCommand(cpu->pgrm,5,JAL,0,-12,0);
 
 	int j = 0;
-	while (j++ < 150000000) {
-		executeCommand(getCommand(pgrm),reg,mem,pgrm);
+	while (j++ < 75000000) {
+		runCommand(cpu);
 	}
-	printRegister(reg);
+	printRegister(cpu->reg);
+	
+	freeCPU(cpu);
 
-	freeRegister(reg);
-	freeMemory(mem);
-	freeProgram(pgrm);
 	return 0;
 
 }
