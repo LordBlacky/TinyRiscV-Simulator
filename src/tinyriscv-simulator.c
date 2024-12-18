@@ -89,7 +89,9 @@ void wM (Memory *mem, int32_t addr, int32_t data) {
 void wR (Register *reg, int32_t addr, int32_t data) {
 
 	if (addr < reg->size && addr >= 0) {
-		(reg->data)[addr] = data;
+		if (addr != 0) {
+			(reg->data)[addr] = data;
+		}
 	} else {
 		printf("ERROR: No valid register address for write access 0 / %d / %d\n",addr,reg->size-1);
 	}
@@ -334,6 +336,36 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 
 }
 
+void printRegister (Register *reg) {
+
+	printf("=========================================================================\n");
+
+	printf("CURRENT REGISTER VIEW\n");
+	
+	printf("-------------------------------------------------------------------------\n");
+
+	printf("x0: %d | x1: %d | x2: %d | x3: %d | x4: %d | x5: %d\n"
+	,reg->data[0],reg->data[1],reg->data[2],reg->data[3],reg->data[4],reg->data[5]);
+	
+	printf("x6: %d | x7: %d | x8: %d | x9: %d | x10: %d | x11: %d\n"
+	,reg->data[6],reg->data[7],reg->data[8],reg->data[9],reg->data[10],reg->data[11]);
+	
+	printf("x12: %d | x13: %d | x14: %d | x15: %d | x16: %d | x17: %d\n"
+	,reg->data[12],reg->data[13],reg->data[14],reg->data[15],reg->data[16],reg->data[17]);
+	
+	printf("x18: %d | x1: %d | x19: %d | x20: %d | x21: %d | x22: %d\n"
+	,reg->data[18],reg->data[19],reg->data[20],reg->data[21],reg->data[22],reg->data[23]);
+	
+	printf("x24: %d | x25: %d | x26: %d | x27: %d | x28: %d | x29: %d\n"
+	,reg->data[24],reg->data[25],reg->data[26],reg->data[27],reg->data[28],reg->data[29]);
+	
+	printf("x30: %d | x31: %d\n"
+	,reg->data[30],reg->data[31]);
+	
+	printf("=========================================================================\n");
+	
+}
+
 int main (int argc, char **argv) {
 
 	Register *reg = createRegister(32);
@@ -349,6 +381,7 @@ int main (int argc, char **argv) {
 	while (j++ < 150000000) {
 		executeCommand(getCommand(pgrm),reg,mem,pgrm);
 	}
+	printRegister(reg);
 
 	freeRegister(reg);
 	freeMemory(mem);
