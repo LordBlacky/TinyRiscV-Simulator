@@ -191,7 +191,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 	int32_t rd = cmd.a;
 	int32_t rs1 = cmd.b;
 	int32_t rs2 = cmd.c;
-	printf("Executing command: %d,%d,%d,%d\n",type,rd,rs1,rs2);
+	// printf("Executing command: %d,%d,%d,%d\n",type,rd,rs1,rs2);
 	
 	switch(type) {
 
@@ -249,6 +249,54 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			wR(reg,rd,(rR(reg,rs1) << rs2));
 			pgrm->pc += 4;
 			break;
+		case ADDI:
+			wR(reg,rd,(rR(reg,rs1) + rs2));
+			pgrm->pc += 4;
+			break;
+		case ANDI:
+			wR(reg,rd,(rR(reg,rs1) & rs2));
+			pgrm->pc += 4;
+			break;
+		case ORI:
+			wR(reg,rd,(rR(reg,rs1) | rs2));
+			pgrm->pc += 4;
+			break;
+		case XORI:
+			wR(reg,rd,(rR(reg,rs1) ^ rs2));
+			pgrm->pc += 4;
+			break;
+		case SLTI:
+			wR(reg,rd,(rR(reg,rs1) < rs2 ? 1 : 0));
+			pgrm->pc += 4;
+			break;
+		case SLTIU:
+			wR(reg,rd,((uint32_t)rR(reg,rs1) < (uint32_t)rs2 ? 1 : 0));
+			pgrm->pc += 4;
+			break;
+		case SRAI:
+			wR(reg,rd,(rR(reg,rs1) >> (rs2 & 31)));
+			pgrm->pc += 4;
+			break;
+		case SRLI:
+			wR(reg,rd,((uint32_t)rR(reg,rs1) >> (rs2 & 31)));
+			pgrm->pc += 4;
+			break;
+		case LUI:
+			wR(reg,rd,(rs1 << 12));
+			pgrm->pc += 4;
+			break;
+		case AUIPC:
+			wR(reg,rd,(pgrm->pc + (rs1 << 12)));
+			pgrm->pc += 4;
+			break;
+		case LW:
+			wR(reg,rd,(rM(mem,rR(reg,rs1) + rs2)));
+			pgrm->pc += 4;
+			break;
+		case SW:
+			wM(mem,rR(reg,rs1) + rs2,rR(reg,rd));
+			pgrm->pc += 4;
+			break;
 		default:
 			break;
 
@@ -262,10 +310,12 @@ int main (int argc, char **argv) {
 	Memory *mem = createMemory(10000);
 	Program *pgrm = createProgram(10000);
 
+	long i = 0;
 	while (1) {
-
+		if (i++ % 1000000 == 0) {
+			printf("Executing instruction number %ld million\n",i/1000000);
+		}
 		executeCommand(getCommand(pgrm),reg,mem,pgrm);
-
 	}
 
 	freeRegister(reg);
