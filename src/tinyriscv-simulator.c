@@ -415,9 +415,14 @@ void freeCPU (CPU *cpu) {
 
 void runCommand (CPU *cpu) {
 
-	pthread_mutex_lock(&cpu->shared->mutex);
-	executeCommand(getCommand(cpu->pgrm),cpu->reg,cpu->shared->mem,cpu->pgrm);
-	pthread_mutex_unlock(&cpu->shared->mutex);
+	Command cmd = getCommand(cpu->pgrm);
+	if (cmd.type == LW || cmd.type == SW) {
+		pthread_mutex_lock(&cpu->shared->mutex);
+		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);
+		pthread_mutex_unlock(&cpu->shared->mutex);
+	} else {
+		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);	
+	}
 
 }
 
@@ -447,7 +452,7 @@ int main (int argc, char **argv) {
 	addCommand(cpu->pgrm,4,ADDI,1,1,-2);
 	addCommand(cpu->pgrm,5,JAL,0,-12,0);
 
-	runCPU(cpu,75000000);
+	runCPU(cpu,100000000);
 	printRegister(cpu->reg);
 	
 	freeCPU(cpu);
