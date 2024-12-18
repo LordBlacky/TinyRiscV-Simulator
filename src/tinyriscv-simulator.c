@@ -297,6 +297,32 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			wM(mem,rR(reg,rs1) + rs2,rR(reg,rd));
 			pgrm->pc += 4;
 			break;
+		case BEQ:
+			pgrm->pc += (rR(reg,rd) == rR(reg,rs1) ? rs2 : 4);
+			break;
+		case BNE:
+			pgrm->pc += (rR(reg,rd) != rR(reg,rs1) ? rs2 : 4);
+			break;
+		case BLT:
+			pgrm->pc += (rR(reg,rd) < rR(reg,rs1) ? rs2 : 4);
+			break;
+		case BGE:
+			pgrm->pc += (rR(reg,rd) >= rR(reg,rs1) ? rs2 : 4);
+			break;
+		case BLTU:
+			pgrm->pc += ((uint32_t)rR(reg,rd) < (uint32_t)rR(reg,rs1) ? rs2 : 4);
+			break;
+		case BGEU:
+			pgrm->pc += ((uint32_t)rR(reg,rd) >= (uint32_t)rR(reg,rs1) ? rs2 : 4);
+			break;
+		case JAL:
+			wR(reg,rd,(pgrm->pc + 4));
+			pgrm->pc += rs1;
+			break;
+		case JALR:
+			wR(reg,rd,(pgrm->pc + 4));
+			pgrm->pc = ((rR(reg,rs1) + rs2) & 0xfffffffe);
+			break;
 		default:
 			break;
 
