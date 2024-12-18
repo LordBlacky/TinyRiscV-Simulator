@@ -373,9 +373,11 @@ int main (int argc, char **argv) {
 	Program *pgrm = createProgram(10000);
 
 	addCommand(pgrm,0,ADDI,1,0,1);
-	addCommand(pgrm,1,ADDI,1,1,2);
-	addCommand(pgrm,2,ADDI,1,1,-2);
-	addCommand(pgrm,3,JAL,0,-8,0);
+	addCommand(pgrm,1,ADDI,4,0,200);
+	addCommand(pgrm,2,ADDI,1,1,2);
+	addCommand(pgrm,3,BEQ,1,4,-12);
+	addCommand(pgrm,4,ADDI,1,1,-2);
+	addCommand(pgrm,5,JAL,0,-12,0);
 
 	int j = 0;
 	while (j++ < 150000000) {
