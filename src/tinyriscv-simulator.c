@@ -421,6 +421,21 @@ void runCommand (CPU *cpu) {
 
 }
 
+void runCPU (CPU *cpu, int lifetime) {
+
+	int instnum = 0;
+	if (lifetime != -1) {
+		while (instnum++ < lifetime) {
+			runCommand(cpu);
+		}
+	} else {
+		while (1) {
+			runCommand(cpu);
+		}
+	}
+
+}
+
 int main (int argc, char **argv) {
 
 	CPU *cpu = createCPU(10000,10000);
@@ -432,10 +447,7 @@ int main (int argc, char **argv) {
 	addCommand(cpu->pgrm,4,ADDI,1,1,-2);
 	addCommand(cpu->pgrm,5,JAL,0,-12,0);
 
-	int j = 0;
-	while (j++ < 75000000) {
-		runCommand(cpu);
-	}
+	runCPU(cpu,75000000);
 	printRegister(cpu->reg);
 	
 	freeCPU(cpu);
