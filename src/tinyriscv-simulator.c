@@ -389,7 +389,7 @@ typedef struct CPU {
 	Program *pgrm;
 } CPU;
 
-CPU *createCPU () {
+CPU *createCPU (int32_t memsize, int32_t pgrmsize) {
 
 	CPU *cpu = malloc(sizeof(CPU));
 	if (cpu == NULL) {
@@ -397,8 +397,8 @@ CPU *createCPU () {
 		return NULL;
 	} else {
 		cpu->reg = createRegister(32);
-		cpu->shared = createSharedMemory(10000);
-		cpu->pgrm = createProgram(10000);
+		cpu->shared = createSharedMemory(memsize);
+		cpu->pgrm = createProgram(pgrmsize);
 	}
 	return cpu;
 
@@ -423,7 +423,7 @@ void runCommand (CPU *cpu) {
 
 int main (int argc, char **argv) {
 
-	CPU *cpu = createCPU();
+	CPU *cpu = createCPU(10000,10000);
 
 	addCommand(cpu->pgrm,0,ADDI,1,0,1);
 	addCommand(cpu->pgrm,1,ADDI,4,0,2147483647);
