@@ -441,6 +441,38 @@ void runCPU (CPU *cpu, int lifetime) {
 
 }
 
+void readProgram (CPU *cpu, char *name) {
+
+	FILE *file = fopen(name,"r");
+	if (file == NULL) {
+		printf("ERROR: cannot open provided file\n");
+	} else {
+		char *line = NULL;
+		size_t len = 0;
+		ssize_t read;
+		int lnum = 0;
+		while ((read = getline(&line,&len,file)) != -1) {
+			CommandType type;
+			int32_t a;
+			int32_t b;
+			int32_t c;
+			char *token = strtok(line," ");
+			type = atoi(token);
+			token = strtok(line," ");
+			a = atoi(token);
+			token = strtok(line," ");
+			b = atoi(token);
+			token = strtok(line," ");
+			c = atoi(token);
+			addCommand(cpu->pgrm,lnum,type,a,b,c);
+			lnum++;
+		}
+		free(line);
+		fclose(file);
+	}
+
+}
+
 int main (int argc, char **argv) {
 
 	CPU *cpu = createCPU(10000,10000);
