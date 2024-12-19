@@ -1,6 +1,6 @@
 simulator:
 	gcc tinyriscv-simulator.c -o simulator
-	./simulator
+	./simulator default
 
 make clean:
 	rm simulator
