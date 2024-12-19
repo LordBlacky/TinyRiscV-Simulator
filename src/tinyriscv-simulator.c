@@ -458,12 +458,13 @@ void readProgram (CPU *cpu, char *name) {
 			int32_t c;
 			char *token = strtok(line," ");
 			type = atoi(token);
-			token = strtok(line," ");
+			token = strtok(NULL," ");
 			a = atoi(token);
-			token = strtok(line," ");
+			token = strtok(NULL," ");
 			b = atoi(token);
-			token = strtok(line," ");
+			token = strtok(NULL,"\n");
 			c = atoi(token);
+
 			addCommand(cpu->pgrm,lnum,type,a,b,c);
 			lnum++;
 		}
@@ -477,14 +478,10 @@ int main (int argc, char **argv) {
 
 	CPU *cpu = createCPU(10000,10000);
 
-	addCommand(cpu->pgrm,0,ADDI,1,0,1);
-	addCommand(cpu->pgrm,1,ADDI,4,0,2147483647);
-	addCommand(cpu->pgrm,2,ADDI,1,1,2);
-	addCommand(cpu->pgrm,3,BEQ,1,4,-12);
-	addCommand(cpu->pgrm,4,ADDI,1,1,-2);
-	addCommand(cpu->pgrm,5,JAL,0,-12,0);
+	readProgram(cpu,argv[1]);
 
 	runCPU(cpu,100000000);
+
 	printRegister(cpu->reg);
 	
 	freeCPU(cpu);
