@@ -474,17 +474,21 @@ void readProgram (CPU *cpu, char *name) {
 
 }
 
+void runSimulation (int memsize, int pgrmsize, int lifetime, char *file) {
+
+	CPU *cpu = createCPU(memsize, pgrmsize);
+
+	readProgram(cpu,file);
+
+	runCPU(cpu,lifetime);
+
+	freeCPU(cpu);
+
+}
+
 int main (int argc, char **argv) {
 
-	CPU *cpu = createCPU(10000,10000);
-
-	readProgram(cpu,argv[1]);
-
-	runCPU(cpu,100000000);
-
-	printRegister(cpu->reg);
-	
-	freeCPU(cpu);
+	runSimulation(10000,10000,100000000,argv[1]);
 
 	return 0;
 
