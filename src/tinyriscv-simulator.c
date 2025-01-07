@@ -6,11 +6,21 @@
 *
 */
 
-#include <stdint.h>
+#include<stdint.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<pthread.h>
+
+// UDP SOCKET FOR I/O ---
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include<arpa/inet.h>
+#include<unistd.h>
+
+#define PORT 50000
+#define BUFFER_SIZE 1024
+// -----------------------
 
 typedef struct Memory {
 	int32_t *data;
@@ -426,7 +436,17 @@ void runCommand (CPU *cpu) {
 
 }
 
-void runCPU (CPU *cpu, int lifetime) {
+typedef struct CPUargs {
+	CPU *cpu;
+	int lifetime;
+} CPUargs;
+
+void *runCPU (void *args) {
+
+	printf("Started running CPU\n");
+
+	CPU *cpu = ((CPUargs *)args)->cpu;
+	int lifetime = ((CPUargs *)args)->lifetime;
 
 	int instnum = 0;
 	if (lifetime != -1) {
@@ -438,6 +458,9 @@ void runCPU (CPU *cpu, int lifetime) {
 			runCommand(cpu);
 		}
 	}
+
+	printf("Stopped running CPU\n");
+	return NULL;
 
 }
 
@@ -474,21 +497,129 @@ void readProgram (CPU *cpu, char *name) {
 
 }
 
-void runSimulation (int memsize, int pgrmsize, int lifetime, char *file) {
+typedef struct IOargs {
+	CPU *cpu;
+	int32_t baseAddr;
+} IOargs;
+
+void *runIOConnector (void *args) {
+
+	printf("Started running IOConnector\n");
+
+	CPU *cpu = ((IOargs *)args)->cpu;
+	int32_t baseAddr = ((IOargs *)args)->baseAddr;
+
+	int sockfd;
+	char buffer[BUFFER_SIZE];
+	struct sockaddr_in servaddr, cliaddr;
+
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		printf("ERROR: Cannot create socket\n");
+		exit(EXIT_FAILURE);
+	}
+
+	memset(&servaddr, 0, sizeof(servaddr));
+	memset(&cliaddr, 0, sizeof(cliaddr));
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port = htons(PORT);
+
+	if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
+		printf("ERROR: Cannot bind socket\n");
+		close(sockfd);
+		exit(EXIT_FAILURE);
+	}
+
+	socklen_t len; 
+	int n;
+	len = sizeof(cliaddr);
+	const char *ack = "Message received";
+
+	while (1) {
+		n = recvfrom(sockfd, (char *)buffer, BUFFER_SIZE, 0, (struct sockaddr *)&cliaddr, &len);
+		if (n < 0) {
+			printf("ERROR: recvfrom() failed\n");
+			continue;
+		}
+		buffer[n] = '\0';
+		sendto(sockfd, ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&cliaddr, len);
+
+		if (strcmp(buffer,"EXIT") == 0) {
+
+			break;
+
+		} else {
+
+			pthread_mutex_lock(&cpu->shared->mutex);
+
+			wM(cpu->shared->mem,baseAddr,atoi(buffer));
+			
+			pthread_mutex_unlock(&cpu->shared->mutex);
+
+		}
+
+	}
+
+	close(sockfd);
+	printf("Stopped running IOConnector\n");
+	return NULL;
+
+}
+
+void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int baseAddr) {
+
+	pthread_t runner, io;
 
 	CPU *cpu = createCPU(memsize, pgrmsize);
 
 	readProgram(cpu,file);
 
-	runCPU(cpu,lifetime);
+	CPUargs *runnerArgs = malloc(sizeof(CPUargs));
+	runnerArgs->cpu = cpu;
+	runnerArgs->lifetime = lifetime;
+
+	IOargs *ioArgs = malloc(sizeof(IOargs));
+	ioArgs->cpu = cpu;
+	ioArgs->baseAddr = baseAddr;
+
+	if (pthread_create(&runner, NULL, runCPU, runnerArgs)) {
+
+		printf("ERROR: Failed to create Runner Thread\n");
+		exit(EXIT_FAILURE);
+
+	}
+
+	if (pthread_create(&io, NULL, runIOConnector, ioArgs)) {
+
+		printf("ERROR: Failed to create I/O Thread\n");
+		exit(EXIT_FAILURE);
+
+	}
+
+	if (pthread_join(io, NULL)) {
+
+		printf("ERROR: joining thread I/O\n");
+		exit(EXIT_FAILURE);
+
+	}
+
+	if (pthread_join(runner, NULL)) {
+
+		printf("ERROR: joining thread Runner\n");
+		exit(EXIT_FAILURE);
+
+	}
 
 	freeCPU(cpu);
+	free(runnerArgs);
+	free(ioArgs);
 
 }
 
 int main (int argc, char **argv) {
 
-	runSimulation(10000,10000,100000000,argv[1]);
+	runSimulation(10000,10000,1000000,argv[1],1000);
 
 	return 0;
 
