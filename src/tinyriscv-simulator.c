@@ -260,8 +260,8 @@ Command getCommand (Program *pgrm) {
 
 void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm);
 
-void executeExpansion(CommandType type, int32_t arg1, int32_t arg2, int32_t arg3, Register *reg, Memory *mem, Program *pgrm)
-{
+void executeExpansion(CommandType type, int32_t arg1, int32_t arg2, int32_t arg3, Register *reg, Memory *mem, Program *pgrm) {
+
 	Command *cmd = malloc(sizeof(Command));
 	cmd->type = type;
 	cmd->a = arg1;
@@ -269,6 +269,7 @@ void executeExpansion(CommandType type, int32_t arg1, int32_t arg2, int32_t arg3
 	cmd->c = arg3;
 	executeCommand(*cmd, reg, mem, pgrm);
 	free(cmd);
+
 }
 
 
@@ -418,7 +419,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			executeExpansion(ADDI, rd, 0, rs1, reg, mem, pgrm);
 			break;
 		case LA:
-			printf("LA instruction is currently not supported");
+			printf("ERROR: LA instruction is currently not supported\n");
 			break;
 		case MV:
 			executeExpansion(ADDI, rd, rs1, 0, reg, mem, pgrm);
