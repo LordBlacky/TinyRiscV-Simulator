@@ -50,7 +50,7 @@ Memory *createMemory (int32_t size) {
 			printf("ERROR: Cannot allocate memory\n");
 			return NULL;
 		} else {
-			mem->size = size;
+			mem->size = size*4;
 		}
 	}
 	return mem;
