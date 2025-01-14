@@ -154,9 +154,12 @@ int32_t rR (Register *reg, int32_t addr) {
 }
 
 typedef enum CommandType {
-	ADD,SUB,AND,OR,XOR,SLT,SLTU,SRA,SRL,SLL,MUL,SLLI,
+	EMPTY,ADD,SUB,AND,OR,XOR,SLT,SLTU,SRA,SRL,SLL,MUL,SLLI,
 	ADDI,ANDI,ORI,XORI,SLTI,SLTIU,SRAI,SRLI,LUI,AUIPC,
-	LW,SW,BEQ,BNE,BLT,BGE,BLTU,BGEU,JAL,JALR,FLAG,EMPTY
+	LW,SW,BEQ,BNE,BLT,BGE,BLTU,BGEU,JAL,JALR,FLAG,
+	//pseudo instructions
+	NOP,LI,LA,MV,NOT,NEG,SEQZ,SNEZ,SLTZ,SGTZ,BEQZ,BNEZ,BLEZ,BGEZ,BLTZ,BGTZ,
+	BGT,BLE, BGTU, BLEU, J,JR,RET
 } CommandType;
 
 typedef struct Command {
@@ -219,6 +222,20 @@ Command getCommand (Program *pgrm) {
 	return (pgrm->addr)[pgrm->pc/4];
 
 }
+
+void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm);
+
+void executeExpansion(CommandType type, int32_t arg1, int32_t arg2, int32_t arg3, Register *reg, Memory *mem, Program *pgrm)
+{
+	Command *cmd = malloc(sizeof(Command));
+	cmd->type = type;
+	cmd->a = arg1;
+	cmd->b = arg2;
+	cmd->c = arg3;
+	executeCommand(*cmd, reg, mem, pgrm);
+	free(cmd);
+}
+
 
 void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 
@@ -357,6 +374,76 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 		case JALR:
 			wR(reg,rd,(pgrm->pc + 4));
 			pgrm->pc = ((rR(reg,rs1) + rs2) & 0xfffffffe);
+			break;
+
+		//also add supported pseudo instruction
+		case NOP:
+			break;
+		case LI:
+			executeExpansion(ADDI, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case LA:
+			printf("LA instruction is currently not supported");
+			break;
+		case MV:
+			executeExpansion(ADDI, rd, rs1, 0, reg, mem, pgrm);
+			break;
+		case NOT:
+			executeExpansion(XORI, rd, rs1, 0, reg, mem, pgrm);
+			break;
+		case NEG:
+			executeExpansion(SUB, rd, 0, 0, reg, mem, pgrm);
+			break;
+		case SEQZ:
+			executeExpansion(SLTIU, rd, rs1, 1, reg, mem, pgrm);
+			break;
+		case SNEZ:
+			executeExpansion(SLTU, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case SLTZ:
+			executeExpansion(SLT, rd, rs1, 0, reg, mem, pgrm);
+			break;
+		case SGTZ:
+			executeExpansion(SLT, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case BEQZ:
+			executeExpansion(BEQ, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case BNEZ:
+			executeExpansion(BNE, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case BLEZ:
+			executeExpansion(BGE, 0, rd, rs1, reg, mem, pgrm);
+			break;
+		case BGEZ:
+			executeExpansion(BGE, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case BLTZ:
+			executeExpansion(BLT, rd, 0, rs1, reg, mem, pgrm);
+			break;
+		case BGTZ:
+			executeExpansion(BLT, 0, rd, rs1, reg, mem, pgrm);
+			break;
+		case BGT:
+			executeExpansion(BLT, rs1, rd, rs2, reg, mem, pgrm);
+			break;
+		case BLE:
+			executeExpansion(BGE, rs1, rd, rs2, reg, mem, pgrm);
+			break;
+		case  BGTU:
+			executeExpansion(BLTU, rs1, rd, rs2, reg, mem, pgrm);
+			break;
+		case BLEU:
+			executeExpansion(BLTU, rs1, rd, rs2, reg, mem, pgrm);
+			break;
+		case J:
+			executeExpansion(JAL, 0, rd, 0, reg, mem, pgrm);
+			break;
+		case JR:
+			executeExpansion(JAL, 1, rd, 0, reg, mem, pgrm);
+			break;
+		case RET:
+			executeExpansion(JALR, 0, 1, 0, reg, mem, pgrm);
 			break;
 		default:
 			break;
