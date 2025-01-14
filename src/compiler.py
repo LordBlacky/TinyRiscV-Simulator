@@ -122,10 +122,12 @@ def get_arg_id(arg: str, labels: dict, current_line):
         return int(r.group(1))
 
     # check if its a immediate
-    if (re.match(r"\d+", arg)):
+    if (re.match(r"^\d+$", arg)):
         return int(arg)
+    elif (re.match(r"0x[0-9a-fA-F]+", arg)):  # number is hex Value
+        return int(arg.lower(), 0)
 
-    # check if its a label
+        # check if its a label
     if (labels.__contains__(arg)):
         return (labels[arg] - current_line) * 4
 

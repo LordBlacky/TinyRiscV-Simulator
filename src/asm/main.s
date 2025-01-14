@@ -1,7 +1,7 @@
 .section .text._start
 .globl _start
 _start:
-    addi t0, x0, 160 # base address
+    addi t0, x0, 0xA0 # base address
     addi x6, x0, 36
 
     #t1
