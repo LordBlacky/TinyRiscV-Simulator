@@ -143,7 +143,7 @@ def init_dict(dest_dict, in_list):
 
 
 def init_alias_dict():
-    instructions_dict(alias_dict, alias_list)
+    init_dict(alias_dict, alias_list)
 
 
 def init_instruction_dict():
