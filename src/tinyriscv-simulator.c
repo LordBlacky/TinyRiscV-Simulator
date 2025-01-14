@@ -162,6 +162,7 @@ int32_t rM (Memory *mem, int32_t addr) {
 			return (int32_t)mem->GPIO_IN;
 		} else if (addr == GPIO_ADDR_OUT) {
 			printf("ERROR: Reading from GPIO_OUT not possible\n");
+			return 0;
 		} else {
 			return *byteAddr;
 		}
