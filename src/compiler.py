@@ -105,8 +105,17 @@ def compile(file):
     print(lines)
 
 
+alias_list = ["zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4",
+              "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"]
+
+alias_dict = {}
+
+
 def get_arg_id(arg: str, labels: dict, current_line):
     # check if its a register
+    if (arg in alias_dict):
+        return alias_dict[arg]
+
     r = re.match(r"x(\d\d?)", arg)
     print(r)
     if (r):
@@ -128,14 +137,23 @@ def get_inst_id(arg: str):
     return instructions_dict[arg]
 
 
+def init_dict(dest_dict, in_list):
+    for i in range(len(in_list)):
+        dest_dict[in_list[i]] = i
+
+
+def init_alias_dict():
+    instructions_dict(alias_dict, alias_list)
+
+
 def init_instruction_dict():
-    for i in range(len(instructions_list)):
-        instructions_dict[instructions_list[i]] = i
+    init_dict(instructions_dict, instructions_list)
 
 
 if __name__ == "__main__":
 
     init_instruction_dict()
+    init_alias_dict()
 
     output_file = "compiled.txt"
     directory = "./asm"
