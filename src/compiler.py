@@ -1,42 +1,15 @@
 import os
 import re
 
-instructions_dict = {
-    "ADD": 0,
-    "SUB": 1,
-    "AND": 2,
-    "OR": 3,
-    "XOR": 4,
-    "SLT": 5,
-    "SLTU": 6,
-    "SRA": 7,
-    "SRL": 8,
-    "SLL": 9,
-    "MUL": 10,
-    "SLLI": 11,
-    "ADDI": 12,
-    "ANDI": 13,
-    "ORI": 14,
-    "XORI": 15,
-    "SLTI": 16,
-    "SLTIU": 17,
-    "SRAI": 18,
-    "SRLI": 19,
-    "LUI": 20,
-    "AUIPC": 21,
-    "LW": 22,
-    "SW": 23,
-    "BEQ": 24,
-    "BNE": 25,
-    "BLT": 26,
-    "BGE": 27,
-    "BLTU": 28,
-    "BGEU": 29,
-    "JAL": 30,
-    "JALR": 31,
-    "FLAG": 32,
-    "EMPTY": 33
-}
+# this is just the enum copied from the simulator
+instructions_list = [
+    "EMPTY", "ADD", "SUB", "AND", "OR", "XOR", "SLT", "SLTU", "SRA", "SRL", "SLL", "MUL", "SLLI",
+    "ADDI", "ANDI", "ORI", "XORI", "SLTI", "SLTIU", "SRAI", "SRLI", "LUI", "AUIPC",
+    "LW", "SW", "BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU", "JAL", "JALR", "FLAG",
+    "NOP", "LI", "LA", "MV", "NOT", "NEG", "SEQZ", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ",
+    "BGT", "BLE", "BGTU", "BLEU", "J", "JR", "RET"]
+
+instructions_dict = {}
 
 
 def concatenate_files(output_file, *input_files):
@@ -112,7 +85,7 @@ def compile(file):
         print(parts)
         # parts = lines[i].split()
         if (parts[0] == ''):
-            continue
+            parts[0] = "EMPTY"  # to fill empty lines with zeros
 
         out_line = str(get_inst_id(parts[0]))
 
@@ -155,7 +128,15 @@ def get_inst_id(arg: str):
     return instructions_dict[arg]
 
 
+def init_instruction_dict():
+    for i in range(len(instructions_list)):
+        instructions_dict[instructions_list[i]] = i
+
+
 if __name__ == "__main__":
+
+    init_instruction_dict()
+
     output_file = "compiled.txt"
     directory = "./asm"
 
