@@ -116,9 +116,12 @@ void freeRegister (Register *reg) {
 }
 
 void wM (Memory *mem, int32_t addr, int32_t data) {
+
+	int8_t *bytePtr = (int8_t *)(mem->data);
+	int32_t *byteAddr = (int32_t *)(bytePtr + addr);
 	
 	if (addr < mem->size && addr >= 0) {
-		(mem->data)[addr] = data;
+		*byteAddr = data;
 	} else {
 		printf("ERROR: No valid memory address for write access 0 / %d / %d\n",addr,mem->size-1);
 	}
@@ -139,8 +142,11 @@ void wR (Register *reg, int32_t addr, int32_t data) {
 
 int32_t rM (Memory *mem, int32_t addr) {
 
+	int8_t *bytePtr = (int8_t *)(mem->data);
+	int32_t *byteAddr = (int32_t *)(bytePtr + addr);
+
 	if (addr < mem->size && addr >= 0) {
-		return (mem->data)[addr];
+		return *byteAddr;
 	} else {
 		printf("ERROR: No valid memory address for read access 0 / %d / %d\n",addr,mem->size-1);
 		return 0;
