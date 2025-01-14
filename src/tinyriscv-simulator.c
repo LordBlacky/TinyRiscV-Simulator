@@ -20,11 +20,15 @@
 
 #define PORT 50000
 #define BUFFER_SIZE 1024
+#define GPIO_ADDR_IN 1000
+#define GPIO_ADDR_OUT 1001
 // -----------------------
 
 typedef struct Memory {
 	int32_t *data;
 	int32_t size;
+	uint8_t GPIO_IN;
+	uint8_t GPIO_OUT;
 } Memory;
 
 typedef struct SharedMemory {
@@ -51,6 +55,8 @@ Memory *createMemory (int32_t size) {
 			return NULL;
 		} else {
 			mem->size = size*4;
+			mem->GPIO_IN = 0;
+			mem->GPIO_OUT = 0;
 		}
 	}
 	return mem;
@@ -121,7 +127,13 @@ void wM (Memory *mem, int32_t addr, int32_t data) {
 	int32_t *byteAddr = (int32_t *)(bytePtr + addr);
 	
 	if (addr < mem->size && addr >= 0) {
-		*byteAddr = data;
+		if (addr == GPIO_ADDR_OUT) {
+			mem->GPIO_OUT = data & 0xFF;
+		} else if (addr == GPIO_ADDR_IN) {
+			printf("ERROR: Writing to GPIO_IN not possible\n");
+		} else {
+			*byteAddr = data;
+		}
 	} else {
 		printf("ERROR: No valid memory address for write access 0 / %d / %d\n",addr,mem->size-1);
 	}
@@ -146,7 +158,13 @@ int32_t rM (Memory *mem, int32_t addr) {
 	int32_t *byteAddr = (int32_t *)(bytePtr + addr);
 
 	if (addr < mem->size && addr >= 0) {
-		return *byteAddr;
+		if (addr == GPIO_ADDR_IN) {
+			return (int32_t)mem->GPIO_IN;
+		} else if (addr == GPIO_ADDR_OUT) {
+			printf("ERROR: Reading from GPIO_OUT not possible\n");
+		} else {
+			return *byteAddr;
+		}
 	} else {
 		printf("ERROR: No valid memory address for read access 0 / %d / %d\n",addr,mem->size-1);
 		return 0;
@@ -505,7 +523,7 @@ void readProgram (CPU *cpu, char *name) {
 
 typedef struct IOargs {
 	CPU *cpu;
-	int32_t baseAddr;
+	int32_t baseAddr; // NO LONGER IN USE, SEE FIRST CODE SECTION INSTEAD
 } IOargs;
 
 void *runIOConnector (void *args) {
@@ -559,8 +577,9 @@ void *runIOConnector (void *args) {
 
 			pthread_mutex_lock(&cpu->shared->mutex);
 
-			wM(cpu->shared->mem,baseAddr,atoi(buffer));
-			
+			// wM(cpu->shared->mem,baseAddr,atoi(buffer));
+			cpu->shared->mem->GPIO_IN = atoi(buffer);
+
 			pthread_mutex_unlock(&cpu->shared->mutex);
 
 		}
