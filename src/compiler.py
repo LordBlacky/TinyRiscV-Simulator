@@ -42,6 +42,48 @@ def concatenate_files(output_file, *input_files):
     return line_ranges
 
 
+def expand_macros(file):
+    lines = []
+    with open(file, 'r') as infile:
+        lines = infile.readlines()
+        count = len(lines)
+
+    # create macro data
+    macros = {}
+    current_macro_name = ''
+    for i in range(count):
+        s = lines[i]
+        # add lines if we are in a macro
+        if current_macro_name != '':
+            if (re.match(r"^\s*\.endm", s)):
+                current_macro_name = ''
+            else:
+                macros[current_macro_name] += s
+
+            lines[i] = ""
+        # otherwise check for new macro
+        else:
+            mac = re.match(r"^\s*\.macro (\w+)\s*$", s)
+            if (mac is not None):
+                if macros.__contains__(mac.group(1)):
+                    print("two identical macros!!! for:", mac.group(1))
+                current_macro_name = mac.group(1)
+                macros[current_macro_name] = ""
+                print("macro: ", current_macro_name)
+                lines[i] = ""
+
+    # expand macros
+    for i in range(count):
+        if re.match(r"^\s*\w+\s*$", lines[i]):
+            s = lines[i].strip()
+            if macros.__contains__(s):
+                lines[i] = macros[s]
+
+    # write File
+    with open(file, 'w') as outfile:
+        outfile.writelines(lines)
+
+
 def compile(file):
     """
     removes comments and replace labels with actuall immediates
@@ -78,11 +120,11 @@ def compile(file):
             labels[this_lab] = i
             lines[i] = "\n"
 
-    print(lines)
+    # print(lines)
     # iterate through lines and replace everything with ids
     for i in range(count):
         parts = re.split(r",? |\(", lines[i].strip())
-        print(parts)
+        # print(parts)
         # parts = lines[i].split()
         if (parts[0] == ''):
             parts[0] = "EMPTY"  # to fill empty lines with zeros
@@ -102,7 +144,7 @@ def compile(file):
     with open(file, 'w') as outfile:
         outfile.writelines(lines)
 
-    print(lines)
+    # print(lines)
 
 
 alias_list = ["zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4",
@@ -113,16 +155,18 @@ alias_dict = {}
 
 def get_arg_id(arg: str, labels: dict, current_line):
     # check if its a register
-    if (arg in alias_dict):
-        return alias_dict[arg]
+    alias_arg = re.match(r"([^\)]*)\)?", arg).group(1)
+    print("alias arg: ", alias_arg, " normal arg: ", arg)
+    if (alias_arg is not None and alias_arg in alias_dict):
+        return int(alias_dict[alias_arg])
 
     r = re.match(r"x(\d\d?)", arg)
-    print(r)
+    # print(r)
     if (r):
         return int(r.group(1))
 
     # check if its a immediate
-    if (re.match(r"^\d+$", arg)):
+    if (re.match(r"^-?\d+$", arg)):
         return int(arg)
     elif (re.match(r"0x[0-9a-fA-F]+", arg)):  # number is hex Value
         return int(arg.lower(), 0)
@@ -179,5 +223,5 @@ if __name__ == "__main__":
         file_paths.remove(e)
 
     ranges = concatenate_files(output_file, *file_paths)
-
+    expand_macros(output_file)
     compile(output_file)
