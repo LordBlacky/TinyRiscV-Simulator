@@ -279,7 +279,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 	int32_t rd = cmd.a;
 	int32_t rs1 = cmd.b;
 	int32_t rs2 = cmd.c;
-	 printf("Executing command: %d,%d,%d,%d\n",type,rd,rs1,rs2);
+	// printf("Executing command: %d,%d,%d,%d\n",type,rd,rs1,rs2);
 	
 	switch(type) {
 
@@ -668,7 +668,8 @@ void *runIOConnector (void *args) {
 
 			// wM(cpu->shared->mem,baseAddr,atoi(buffer));
 			cpu->shared->mem->GPIO_IN = atoi(buffer);
-			printf("%d\n",cpu->shared->mem->GPIO_IN);
+			// printf("%d\n",cpu->shared->mem->GPIO_IN);
+
 			pthread_mutex_unlock(&cpu->shared->mutex);
 
 		}
