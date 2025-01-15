@@ -12,7 +12,7 @@
 #include<string.h>
 #include<pthread.h>
 
-// UDP SOCKET FOR I/O ---
+// UDP SOCKET FOR I/O AND I2C DEVICES ---
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<arpa/inet.h>
@@ -20,8 +20,11 @@
 
 #define PORT 50000
 #define BUFFER_SIZE 1024
-#define GPIO_ADDR_IN 1000
-#define GPIO_ADDR_OUT 1001
+#define GPIO_ADDR_IN 0x100001
+#define GPIO_ADDR_OUT 0x100000
+#define I2C_ADDR_MIN 0x100004
+#define I2C_ADDR_MAX 0x100084
+#define DISPLAY_ADDR 0x100040
 // -----------------------
 
 typedef struct Memory {
@@ -29,6 +32,8 @@ typedef struct Memory {
 	int32_t size;
 	uint8_t GPIO_IN;
 	uint8_t GPIO_OUT;
+	int32_t I2C_REST;
+	int32_t DISPLAY;
 } Memory;
 
 typedef struct SharedMemory {
@@ -57,6 +62,8 @@ Memory *createMemory (int32_t size) {
 			mem->size = size*4;
 			mem->GPIO_IN = 0;
 			mem->GPIO_OUT = 0;
+			mem->DISPLAY = 0;
+			mem->I2C_REST = 0;
 		}
 	}
 	return mem;
@@ -131,6 +138,12 @@ void wM (Memory *mem, int32_t addr, int32_t data) {
 			mem->GPIO_OUT = data & 0xFF;
 		} else if (addr == GPIO_ADDR_IN) {
 			printf("ERROR: Writing to GPIO_IN not possible\n");
+		} else if (addr >= I2C_ADDR_MIN && addr <= I2C_ADDR_MAX ) {
+			if (addr == DISPLAY_ADDR) {
+				mem->DISPLAY = data;
+			} else {
+				mem->I2C_REST = data;
+			}
 		} else {
 			*byteAddr = data;
 		}
@@ -163,6 +176,12 @@ int32_t rM (Memory *mem, int32_t addr) {
 		} else if (addr == GPIO_ADDR_OUT) {
 			printf("ERROR: Reading from GPIO_OUT not possible\n");
 			return 0;
+		} else if (addr >= I2C_ADDR_MIN && addr <= I2C_ADDR_MAX){
+			if (addr == DISPLAY_ADDR) {
+				return mem->DISPLAY;
+			} else {
+				return mem->I2C_REST;
+			}
 		} else {
 			return *byteAddr;
 		}
