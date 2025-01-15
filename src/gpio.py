@@ -15,20 +15,25 @@ def send_udp():
         client_socket.sendto(str(gpio).encode(), server_address)
         time.sleep(0.1)
 
-def handle_keys(keys):
+def handle_keys():
     global gpio
+    keys = pygame.key.get_pressed()
+
     if keys[pygame.K_w]:
         pressed_keys.add('w')
     else:
         pressed_keys.discard('w')
+
     if keys[pygame.K_a]:
         pressed_keys.add('a')
     else:
         pressed_keys.discard('a')
+
     if keys[pygame.K_s]:
         pressed_keys.add('s')
     else:
         pressed_keys.discard('s')
+
     if keys[pygame.K_d]:
         pressed_keys.add('d')
     else:
@@ -63,12 +68,11 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
-                keys = pygame.key.get_pressed()
-                handle_keys(keys)
 
-            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                running = False
+        handle_keys()
+
+        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            running = False
 
         time.sleep(0.01)
 
