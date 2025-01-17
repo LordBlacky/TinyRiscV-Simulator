@@ -87,7 +87,7 @@ def expand_macros(file):
 def compile(file):
     """
     removes comments and replace labels with actuall immediates
-    also adds a JAL instruction to the lable _start
+    also adds a JAL instruction to the lable _start (still todo)
     then replace the instructions and argumends with ids
     """
     lines = []
@@ -124,8 +124,13 @@ def compile(file):
     # iterate through lines and replace everything with ids
     for i in range(count):
         parts = re.split(r",? |\(", lines[i].strip())
-        # print(parts)
-        # parts = lines[i].split()
+        # if bracket syntax is used (e.g "jalr x1 0(x2)"):
+        # swap second and third argument
+        if (re.match(r"\d\(.+\)", lines[i])):
+            t = parts[1]
+            parts[1] = parts[2]
+            parts[2] = t
+
         if (parts[0] == ''):
             parts[0] = "EMPTY"  # to fill empty lines with zeros
 
@@ -156,7 +161,7 @@ alias_dict = {}
 def get_arg_id(arg: str, labels: dict, current_line):
     # check if its a register
     alias_arg = re.match(r"([^\)]*)\)?", arg).group(1)
-    print("alias arg: ", alias_arg, " normal arg: ", arg)
+    # print("alias arg: ", alias_arg, " normal arg: ", arg)
     if (alias_arg is not None and alias_arg in alias_dict):
         return int(alias_dict[alias_arg])
 
