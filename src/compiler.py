@@ -123,7 +123,7 @@ def compile(file):
     # print(lines)
     # iterate through lines and replace everything with ids
     for i in range(count):
-        parts = re.split(r",? |\(", lines[i].strip())
+        parts = re.split(r",? |,|\(", lines[i].strip())
         # if bracket syntax is used (e.g "jalr x1 0(x2)"):
         # swap second and third argument
         if (re.match(r"\d\(.+\)", lines[i])):
