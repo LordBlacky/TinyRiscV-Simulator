@@ -213,7 +213,7 @@ typedef enum CommandType {
 	LW,SW,BEQ,BNE,BLT,BGE,BLTU,BGEU,JAL,JALR,FLAG,
 	//pseudo instructions
 	NOP,LI,LA,MV,NOT,NEG,SEQZ,SNEZ,SLTZ,SGTZ,BEQZ,BNEZ,BLEZ,BGEZ,BLTZ,BGTZ,
-	BGT,BLE, BGTU, BLEU, J,JR,RET
+	BGT,BLE, BGTU, BLEU, J,JR,RET,CALL
 } CommandType;
 
 typedef struct Command {
@@ -495,10 +495,13 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			executeExpansion(JAL, 0, rd, 0, reg, mem, pgrm);
 			break;
 		case JR:
-			executeExpansion(JAL, 1, rd, 0, reg, mem, pgrm);
+			executeExpansion(JALR, 0, rd, 0, reg, mem, pgrm);
 			break;
 		case RET:
 			executeExpansion(JALR, 0, 1, 0, reg, mem, pgrm);
+			break;
+		case CALL:
+			executeExpansion(JAL, 1, rd, 0, reg, mem, pgrm);
 			break;
 		default:
 			break;
