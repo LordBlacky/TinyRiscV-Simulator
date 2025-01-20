@@ -28,6 +28,8 @@ def concatenate_files(output_file, *input_files):
     current_line = 1
 
     with open(output_file, 'w') as outfile:
+        # add instruction to jump to start label
+        outfile.writelines(["j _start\n"])
         for input_file in input_files:
             with open(input_file, 'r') as infile:
                 lines = infile.readlines()
@@ -229,4 +231,4 @@ if __name__ == "__main__":
 
     ranges = concatenate_files(output_file, *file_paths)
     expand_macros(output_file)
-    compile(output_file)
+    # compile(output_file)
