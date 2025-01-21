@@ -57,6 +57,28 @@ void deleteDisplay () {
 
 void sendCommand (int32_t command) {
 
-	
+    uint8_t fourthByte = (command >> 0) & 0xFF;
+    uint8_t thirdByte = (command >> 8) & 0xFF;
+    uint8_t secondByte = (command >> 16) & 0xFF;
+    uint8_t mask = (command >> 24) & 0xFF;
+	uint8_t identifier;
+	uint8_t data;
 
+	switch (mask) {
+		case 0x03: identifier = thirdByte; data = fourthByte; break;
+		case 0x06: identifier = secondByte; data = thirdByte; break;
+		case 0x05: identifier = secondByte; data = fourthByte; break;
+		default: break;
+	};
+
+	switch (identifier) {
+		case 0x00: switch(data) {
+			default: break;
+		}; break;
+		case 0xC0: switch(data) {
+			default: break;
+		}; break;
+		default: break;
+	};
+    
 }
