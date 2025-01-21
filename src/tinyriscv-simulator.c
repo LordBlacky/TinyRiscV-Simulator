@@ -11,6 +11,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<pthread.h>
+#include "display.h"
 
 // UDP SOCKET FOR I/O AND I2C DEVICES ---
 #include<sys/socket.h>
@@ -564,6 +565,7 @@ void runCommand (CPU *cpu) {
 	if (cmd.type == LW || cmd.type == SW) {
 		pthread_mutex_lock(&cpu->shared->mutex);
 		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);
+		sendCommand(cpu->shared->mem->DISPLAY);
 		pthread_mutex_unlock(&cpu->shared->mutex);
 	} else {
 		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);	
@@ -710,6 +712,8 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 
 	CPU *cpu = createCPU(memsize, pgrmsize);
 
+	createDisplay();
+
 	readProgram(cpu,file);
 
 	CPUargs *runnerArgs = malloc(sizeof(CPUargs));
@@ -749,6 +753,7 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 	}
 
 	freeCPU(cpu);
+	deleteDisplay();
 	free(runnerArgs);
 	free(ioArgs);
 
