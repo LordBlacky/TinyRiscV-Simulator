@@ -7,7 +7,7 @@ instructions_list = [
     "ADDI", "ANDI", "ORI", "XORI", "SLTI", "SLTIU", "SRAI", "SRLI", "LUI", "AUIPC",
     "LW", "SW", "BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU", "JAL", "JALR", "FLAG",
     "NOP", "LI", "LA", "MV", "NOT", "NEG", "SEQZ", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ",
-    "BGT", "BLE", "BGTU", "BLEU", "J", "JR", "RET","CALL"]
+    "BGT", "BLE", "BGTU", "BLEU", "J", "JR", "RET", "CALL"]
 
 instructions_dict = {}
 
@@ -45,6 +45,27 @@ def concatenate_files(output_file, *input_files):
 
 
 def expand_macros(file):
+    class Macro:
+        def __init__(self, name: str, text: str, args: list):
+            self.name = name
+            self.args = args
+            self.text = text
+
+        def get_replaced_text(self, input_args):
+            if (len(input_args) != len(self.args)):
+                print(
+                    f"Error: arguments given for {self.name} does not match defined number")
+
+            to_insert = self.text
+            for i in range(len(self.args)):
+                print(r"\\" + self.args[i] + r"\s+")
+                pattern = re.escape(
+                    "\\" + self.args[i]) + r"((\s*,\s*)|(\s+)|$)"
+                to_insert = re.sub(
+                    pattern, input_args[i] + r"\1", to_insert, re.M)
+
+            return to_insert
+
     lines = []
     with open(file, 'r') as infile:
         lines = infile.readlines()
@@ -60,26 +81,41 @@ def expand_macros(file):
             if (re.match(r"^\s*\.endm", s)):
                 current_macro_name = ''
             else:
-                macros[current_macro_name] += s
+                macros[current_macro_name].text += s
 
             lines[i] = ""
         # otherwise check for new macro
         else:
-            mac = re.match(r"^\s*\.macro (\w+)\s*$", s)
+            mac_pattern = r"^\s*\.macro(\s+|\s*,\s*)(\w+)"
+            mac = re.match(mac_pattern, s)
             if (mac is not None):
-                if macros.__contains__(mac.group(1)):
-                    print("two identical macros!!! for:", mac.group(1))
-                current_macro_name = mac.group(1)
-                macros[current_macro_name] = ""
+                if macros.__contains__(mac.group(2)):
+                    print("two identical macros!!! for:", mac.group(2))
+                current_macro_name = mac.group(2)
                 print("macro: ", current_macro_name)
+
+                # parse arguments:
+                args_raw = re.sub(mac_pattern, "", s)
+                args = re.split(r"\s*,\s*|\s+", args_raw.strip())
+
+                # create macro object
+                macros[current_macro_name] = Macro(
+                    current_macro_name, "", args)
                 lines[i] = ""
 
     # expand macros
     for i in range(count):
-        if re.match(r"^\s*\w+\s*$", lines[i]):
+        m = re.match(r"^\s*\w+", lines[i])
+        if m is not None:
+            if not macros.__contains__(m.group(0).strip()):
+                print(m.group(0), " is not a macro")
+                continue
+
             s = lines[i].strip()
-            if macros.__contains__(s):
-                lines[i] = macros[s]
+            s = re.sub(m.group(0), "", s)
+            args = re.split(r"\s*,\s*|\s+", s)
+
+            lines[i] = macros[m.group(0).strip()].get_replaced_text(args[1:])
 
     # write File
     with open(file, 'w') as outfile:
