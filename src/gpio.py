@@ -1,3 +1,11 @@
+#
+# TinyRiscV-Simulator 2024
+# ===========================
+#
+# Project: https://github.com/LordBlacky/TinyRiscV-Simulator
+#
+#
+
 import keyboard
 import socket
 

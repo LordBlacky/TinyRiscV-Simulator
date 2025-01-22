@@ -1,7 +1,7 @@
 simulator:
-	gcc tinyriscv-simulator.c -o simulator.out
-	./simulator.out default
+	gcc display.c tinyriscv-simulator.c -o simulator
+	./simulator default
 
 make clean:
-	rm *.out
+	rm simulator
 
