@@ -23,6 +23,7 @@
 #define RIGHT_WINDOW_PADDING 140 // Distance to the right side debug info
 #define BOTTOM_WINDOW_PADDING 70
 #define INSTRUCTION_LINES 10 // Number of instructions shown when debugging
+#define NUMBER_OF_INSTRUCTIONS 20
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -32,17 +33,20 @@ WINDOW *win;
 
 void print_instructions(int line) {
   // Print all lines
-  int max_lines = (line + 20) < (line_count) ? (line + 10) : (line_count);
+  int max_lines = (line + NUMBER_OF_INSTRUCTIONS) < (line_count) ? (line + NUMBER_OF_INSTRUCTIONS) : (line_count);
   for (size_t i = line; i < max_lines; i++) {
 
     wmove(win, 0 + i - line, RIGHT_WINDOW_PADDING);
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 
-  wrefresh(win);
 }
 
-void print_display(char *display) {}
+void print_display(char *display) {
+  wmove(win, 0, 0);
+  wprintw(win, "%s", display);
+
+}
 
 void load_debug_file() {
   const char *filename = "./debugger_info.txt";
@@ -96,7 +100,7 @@ void init_screen() {
   int res_y = 70;
   int res_x = 200;
   win = newwin(res_y, res_x, 0, 0);
-  // box(win, 0, 0);
+  box(win, 0, 0);
   wmove(win, 1, 1);
   refresh();
   wrefresh(win);
@@ -127,10 +131,17 @@ void *startDebugger(void *args) {
   //
   // void runCommand (CPU *cpu); -> CPU
   //
+  init_debugger();
+  print_instructions(0);
+  refresh();wrefresh(win);
+  getch();
   while (1) {
     runCommand(cpu);
     print_display(getPixels());
-    print_instructions(cpu->pgrm->pc);
+    print_instructions(cpu->pgrm->pc/4);
+
+    refresh();
+    wrefresh(win);
     getch();
   }
 
@@ -138,5 +149,3 @@ void *startDebugger(void *args) {
   return NULL;
 }
 
-// for testting
-int main() { init_debugger(); }

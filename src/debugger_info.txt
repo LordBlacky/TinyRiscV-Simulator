@@ -1,13 +1,4 @@
 j _start
-<<<<<<< HEAD
-=======
-.section .text
-.global sub
-
-sub:
-    addi x1, x1, 1
-    jalr x0, x2, 0
->>>>>>> 652cb4529a6b63dfebf415e5a1e52cfe404f915f
 .section .text._start
 .globl _start
 _start:
@@ -38,12 +29,9 @@ loop:
 end:
     addi x1, x0, 1
     bne x1, x0, end
-<<<<<<< HEAD
 .section .text
 .global sub
 
 sub:
     addi x1, x1, 1
     jalr x0, x2, 0
-=======
->>>>>>> 652cb4529a6b63dfebf415e5a1e52cfe404f915f
