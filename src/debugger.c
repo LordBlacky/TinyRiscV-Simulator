@@ -1,8 +1,22 @@
+/*
+ * TinyRiscV-Simulator 2024
+ * ===========================
+ *
+ * Project: https://github.com/LordBlacky/TinyRiscV-Simulator
+ *
+ */
+
+//------------ REQUIRED FUNCTIONS -------------
+
 #include <curses.h>
 #include <ncurses.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "cpu.h"
+#include "display.h"
 
 #define MAX_LINES 1024           // Maximum number of lines
 #define MAX_LINE_LENGTH 1024     // Maximum length of a single line
@@ -21,12 +35,14 @@ void print_instructions(int line) {
   int max_lines = (line + 20) < (line_count) ? (line + 10) : (line_count);
   for (size_t i = line; i < max_lines; i++) {
 
-    wmove(win, 0+i-line, RIGHT_WINDOW_PADDING);
-    wprintw(win,"%zu: %s", i + 1, lines[i]);
+    wmove(win, 0 + i - line, RIGHT_WINDOW_PADDING);
+    wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 
   wrefresh(win);
 }
+
+void print_display(char *display) {}
 
 void load_debug_file() {
   const char *filename = "./debugger_info.txt";
@@ -80,18 +96,47 @@ void init_screen() {
   int res_y = 70;
   int res_x = 200;
   win = newwin(res_y, res_x, 0, 0);
-  //box(win, 0, 0);
+  // box(win, 0, 0);
   wmove(win, 1, 1);
   refresh();
   wrefresh(win);
 }
 
-int main() {
+void init_debugger() {
   init_screen();
   load_debug_file();
-  print_instructions(4);
-
 
   getch();
   endwin();
 }
+
+void *startDebugger(void *args);
+
+//---------------------------------------------
+
+void *startDebugger(void *args) {
+
+  CPU *cpu = (CPU *)args;
+  printf("Started running Debugger\n");
+
+  // PLACE CODE HERE
+  //
+  // USEFULL FUNCTIONS
+  //
+  // char *getPixels (); -> Display
+  //
+  // void runCommand (CPU *cpu); -> CPU
+  //
+  while (1) {
+    runCommand(cpu);
+    print_display(getPixels());
+    print_instructions(cpu->pgrm->pc);
+    getch();
+  }
+
+  printf("Stopped running Debugger\n");
+  return NULL;
+}
+
+// for testting
+int main() { init_debugger(); }

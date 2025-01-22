@@ -19,4 +19,6 @@ void createDisplay ();
 
 void deleteDisplay ();
 
+char *getPixels ();
+
 #endif

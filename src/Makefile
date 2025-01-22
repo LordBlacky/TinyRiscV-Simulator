@@ -1,5 +1,5 @@
 simulator:
-	gcc display.c tinyriscv-simulator.c -o simulator
+	gcc display.c debugger.c tinyriscvsimulator.c -o simulator
 	./simulator compiled.txt
 
 make compile_asm:

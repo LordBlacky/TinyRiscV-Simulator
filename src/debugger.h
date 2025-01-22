@@ -6,17 +6,13 @@
 *
 */
 
-#ifndef DISPLAY_H_
-#define DISPLAY_H_
+#ifndef DEBUGGER_H_
+#define DEBUGGER_H_
 
 #include<stdint.h>
 
-// DISPLAY INTERFACE
+// DEBUGGER INTERFACE
 
-void sendCommand (int32_t command);
-
-void createDisplay ();
-
-void deleteDisplay ();
+void *startDebugger (void *args);
 
 #endif
