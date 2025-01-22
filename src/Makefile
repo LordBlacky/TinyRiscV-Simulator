@@ -1,6 +1,6 @@
 simulator:
-	gcc display.c tinyriscv-simulator.c -o simulator
-	./simulator compiled.txt
+	gcc display.c debugger.c tinyriscvsimulator.c -o simulator
+	./simulator default
 
 make compile_asm:
 	python3 compiler.py

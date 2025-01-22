@@ -15,6 +15,7 @@
 void sendCommand (int32_t command);
 void createDisplay ();
 void deleteDisplay ();
+char *getPixels ();
 
 //---------------------------------------------
 
@@ -46,12 +47,33 @@ void createDisplay () {
 	display->pages = PAGES;
 	display->colIDX = 0;
 	display->pageIDX = 0;
+	for (int i = 0; i<RESOLUTION; i++) {
+		display->pixels[i] = ' ';
+	}
 
 }
 
 void deleteDisplay () {
 
 	free(display);
+
+}
+
+void runDisplayCommand (uint8_t data) {
+
+
+
+}
+
+void runUpdate (uint8_t data) {
+
+
+
+}
+
+char *getPixels () {
+
+	return &(display->pixels[0]);
 
 }
 
@@ -72,12 +94,8 @@ void sendCommand (int32_t command) {
 	};
 
 	switch (identifier) {
-		case 0x00: switch(data) {
-			default: break;
-		}; break;
-		case 0xC0: switch(data) {
-			default: break;
-		}; break;
+		case 0x00: runDisplayCommand(data); break;
+		case 0xC0: runUpdate(data); break;
 		default: break;
 	};
     
