@@ -44,7 +44,7 @@ def concatenate_files(output_file, *input_files):
     return line_ranges
 
 
-def expand_macros(file):
+def expand_macros(input_file, output_file):
     class Macro:
         def __init__(self, name: str, text: str, args: list):
             self.name = name
@@ -67,7 +67,7 @@ def expand_macros(file):
             return to_insert
 
     lines = []
-    with open(file, 'r') as infile:
+    with open(input_file, 'r') as infile:
         lines = infile.readlines()
         count = len(lines)
 
@@ -118,18 +118,18 @@ def expand_macros(file):
             lines[i] = macros[m.group(0).strip()].get_replaced_text(args[1:])
 
     # write File
-    with open(file, 'w') as outfile:
+    with open(output_file, 'w') as outfile:
         outfile.writelines(lines)
 
 
-def compile(file):
+def compile(input_file, output_file):
     """
     removes comments and replace labels with actuall immediates
     also adds a JAL instruction to the lable _start (still todo)
     then replace the instructions and argumends with ids
     """
     lines = []
-    with open(file, 'r') as infile:
+    with open(input_file, 'r') as infile:
         lines = infile.readlines()
         count = len(lines)
 
@@ -184,7 +184,7 @@ def compile(file):
         lines[i] = out_line + "\n"
 
     # write File
-    with open(file, 'w') as outfile:
+    with open(output_file, 'w') as outfile:
         outfile.writelines(lines)
 
     # print(lines)
@@ -245,6 +245,7 @@ if __name__ == "__main__":
     init_alias_dict()
 
     output_file = "compiled.txt"
+    debug_file = "debugger_info.txt"
     directory = "./asm"
 
     file_paths = []
@@ -266,5 +267,5 @@ if __name__ == "__main__":
         file_paths.remove(e)
 
     ranges = concatenate_files(output_file, *file_paths)
-    expand_macros(output_file)
-    # compile(output_file)
+    expand_macros(output_file, debug_file)
+    compile(debug_file, output_file)
