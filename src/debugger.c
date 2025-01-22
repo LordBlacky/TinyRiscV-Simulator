@@ -12,6 +12,7 @@
 #include<stdlib.h>
 #include<stdint.h>
 #include "cpu.h"
+#include "display.h"
 
 void *startDebugger (void *args);
 
@@ -23,6 +24,13 @@ void *startDebugger (void *args) {
 	printf("Started running Debugger\n");
 
 	// PLACE CODE HERE
+	//
+	// USEFULL FUNCTIONS
+	//
+	// char *getPixels (); -> Display
+	//
+	// void runCommand (CPU *cpu); -> CPU
+	//
 
 	printf("Stopped running Debugger\n");
 	return NULL;
