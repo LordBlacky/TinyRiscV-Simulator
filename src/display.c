@@ -11,23 +11,15 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdint.h>
-
-void sendCommand (int32_t command);
-void createDisplay ();
-void deleteDisplay ();
-char *getPixels ();
+#include "display.h"
 
 //---------------------------------------------
 
 
 //------------ DEFINE DISPLAY -----------------
 
-#define RESOLUTION 132*64
-#define COLS 132
-#define PAGES 8
-
 typedef struct Display {
-	char pixels[RESOLUTION];
+	char pixels[PAGES*8][COLS];
 	int pages;
 	int cols;
 	int pageIDX;
@@ -47,8 +39,10 @@ void createDisplay () {
 	display->pages = PAGES;
 	display->colIDX = 0;
 	display->pageIDX = 0;
-	for (int i = 0; i<RESOLUTION; i++) {
-		display->pixels[i] = ' ';
+	for (int i = 0; i< PAGES*8; i++) {
+		for (int j = 0; i < COLS; i++) {
+			display->pixels[i][j] = ' ';
+		}
 	}
 
 }
@@ -67,11 +61,11 @@ void runDisplayCommand (uint8_t data) {
 
 void runUpdate (uint8_t data) {
 
-
+	
 
 }
 
-char *getPixels () {
+char (*getPixels()) [COLS] {
 
 	return &(display->pixels[0]);
 

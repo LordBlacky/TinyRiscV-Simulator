@@ -19,6 +19,10 @@ void createDisplay ();
 
 void deleteDisplay ();
 
-char *getPixels ();
+#define COLS 132
+
+#define PAGES 8
+
+char (*getPixels()) [COLS];
 
 #endif
