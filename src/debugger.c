@@ -42,9 +42,12 @@ void print_instructions(int line) {
 
 }
 
-void print_display(char *display) {
+void print_display(char (*display)[COLS + 1]) {
   wmove(win, 0, 0);
-  wprintw(win, "%s", display);
+  int i;
+  for(i = 0; i < PAGES * 8; i++){
+    wprintw(win, "%s\n", display[i]);
+  }
 
 }
 
