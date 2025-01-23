@@ -56,13 +56,27 @@ void deleteDisplay () {
 
 void runDisplayCommand (uint8_t data) {
 
-
+	switch (data) {
+		case 0xAE: display->power = 0; break;
+		case 0xAF: display->power = 1; break;
+		case 0x00 ... 0x0F: display->colIDX = (display->colIDX & 0xF0) + (data & 0x0F); break;
+		case 0x10 ... 0x1F: display->colIDX = (display->colIDX & 0x0F) + ((data & 0x0F) << 4); break;
+		case 0xB0 ... 0xB7: display->pageIDX = data & 0x0F; break;
+		default: break;
+	};
 
 }
 
 void runUpdate (uint8_t data) {
 
-	
+	display->pixels[display->pageIDX*8 + 0][display->colIDX] = data & 1 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 1][display->colIDX] = data & 2 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 2][display->colIDX] = data & 4 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 3][display->colIDX] = data & 8 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 4][display->colIDX] = data & 16 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 5][display->colIDX] = data & 32 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 6][display->colIDX] = data & 64 ? '#' : ' ';
+	display->pixels[display->pageIDX*8 + 7][display->colIDX] = data & 128 ? '#' : ' ';
 
 }
 
