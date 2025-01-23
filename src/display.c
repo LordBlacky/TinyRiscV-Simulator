@@ -77,6 +77,7 @@ void runUpdate (uint8_t data) {
 	display->pixels[display->pageIDX*8 + 5][display->colIDX] = data & 32 ? '#' : ' ';
 	display->pixels[display->pageIDX*8 + 6][display->colIDX] = data & 64 ? '#' : ' ';
 	display->pixels[display->pageIDX*8 + 7][display->colIDX] = data & 128 ? '#' : ' ';
+	display->colIDX = (display->colIDX + 1) % COLS;
 
 }
 
