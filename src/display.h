@@ -23,6 +23,6 @@ void deleteDisplay ();
 
 #define PAGES 8
 
-char (*getPixels()) [COLS];
+char (*getPixels()) [COLS+1];
 
 #endif

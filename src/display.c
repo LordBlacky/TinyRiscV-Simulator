@@ -66,7 +66,7 @@ void runUpdate (uint8_t data) {
 
 }
 
-char (*getPixels()) [COLS] {
+char (*getPixels()) [COLS+1] {
 
 	return &(display->pixels[0]);
 
