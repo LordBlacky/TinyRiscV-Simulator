@@ -19,7 +19,7 @@
 //------------ DEFINE DISPLAY -----------------
 
 typedef struct Display {
-	char pixels[PAGES*8][COLS];
+	char pixels[PAGES*8][COLS+1];
 	int pages;
 	int cols;
 	int pageIDX;
@@ -43,6 +43,7 @@ void createDisplay () {
 		for (int j = 0; i < COLS; i++) {
 			display->pixels[i][j] = ' ';
 		}
+		display->pixels[i][COLS] = '\00';
 	}
 
 }
