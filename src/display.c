@@ -40,8 +40,8 @@ void createDisplay () {
 	display->colIDX = 0;
 	display->pageIDX = 0;
 	for (int i = 0; i< PAGES*8; i++) {
-		for (int j = 0; i < COLS; i++) {
-			display->pixels[i][j] = ' ';
+		for (int j = 0; j < COLS; j++) {
+			display->pixels[i][j] = '-';
 		}
 		display->pixels[i][COLS] = '\00';
 	}
