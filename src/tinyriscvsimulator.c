@@ -125,6 +125,7 @@ void wM (Memory *mem, int32_t addr, int32_t data) {
 		} else if (addr >= I2C_ADDR_MIN && addr <= I2C_ADDR_MAX ) {
 			if (addr == DISPLAY_ADDR) {
 				mem->DISPLAY = data;
+				sendCommand(mem->DISPLAY);
 			} else {
 				mem->I2C_REST = data;
 			}
@@ -520,7 +521,6 @@ void runCommand (CPU *cpu) {
 	if (cmd.type == LW || cmd.type == SW) {
 		pthread_mutex_lock(&cpu->shared->mutex);
 		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);
-		sendCommand(cpu->shared->mem->DISPLAY);
 		pthread_mutex_unlock(&cpu->shared->mutex);
 	} else {
 		executeCommand(cmd,cpu->reg,cpu->shared->mem,cpu->pgrm);	
