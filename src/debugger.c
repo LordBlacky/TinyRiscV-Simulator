@@ -46,6 +46,27 @@ void print_instructions(int line) {
   }
 }
 
+void printRegister(Register *reg) {
+    wmove(win, 25, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+    wprintw(win, "=====================================================================================\n");
+    wmove(win,26, RIGHT_WINDOW_PADDING);
+    wprintw(win, "CURRENT REGISTER VIEW\n");
+    wmove(win,27, RIGHT_WINDOW_PADDING);
+    wprintw(win, "-------------------------------------------------------------------------------------\n");
+
+    int i = 0;
+    for (;i < reg->size; i += 4) {
+        wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
+        wprintw(win, "x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n",
+                i, reg->data[i],
+                i + 1, reg->data[i + 1],
+                i + 2, reg->data[i + 2],
+                i + 3, reg->data[i + 3]);
+    }
+    wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "=====================================================================================\n");
+}
+
 void print_display(char (*display)[COLS + 1]) {
   wmove(win, 0, 0);
   int i;
@@ -128,6 +149,7 @@ void *threadOne(void *args) {
 
     print_display(getPixels());
     print_instructions(cpu->pgrm->pc / 4);
+    printRegister(cpu->reg);
 
     refresh();
     wrefresh(win);

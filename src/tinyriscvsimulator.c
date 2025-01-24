@@ -473,7 +473,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 	}
 
 }
-
+/*
 void printRegister(Register *reg) {
 
     printf("=====================================================================================\n");
@@ -491,7 +491,7 @@ void printRegister(Register *reg) {
     printf("=====================================================================================\n");
 
 }
-
+*/
 CPU *createCPU (int32_t memsize, int32_t pgrmsize) {
 
 	CPU *cpu = malloc(sizeof(CPU));
