@@ -7,6 +7,7 @@
 */
 
 #include<stdint.h>
+#include<unistd.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -651,9 +652,22 @@ void *runIOConnector (void *args) {
 
 }
 
-void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int baseAddr) {
+void *printDisplay (void *args) {
 
-	pthread_t runner, io;
+	while (1) {
+		usleep(500000);
+		system("clear");
+		for (int i = 0; i < PAGES*8; i++) {
+			printf("%s\n",getPixels()[i]);
+		}
+	}
+	return NULL;
+
+}
+
+void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int baseAddr, int debugger) {
+
+	pthread_t runner, io, display;
 
 	CPU *cpu = createCPU(memsize, pgrmsize);
 
@@ -668,34 +682,55 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 	IOargs *ioArgs = malloc(sizeof(IOargs));
 	ioArgs->cpu = cpu;
 	ioArgs->baseAddr = baseAddr;
+        switch (debugger) {
+                case 1:
 
-	/*
-	if (pthread_create(&runner, NULL, runCPU, runnerArgs)) {
+		if (pthread_create(&runner,NULL,startDebugger,cpu)) {
 
-		printf("ERROR: Failed to create Runner Thread\n");
-		exit(EXIT_FAILURE);
+			printf("ERROR: Failed to create Runner Thread\n");
+			exit(EXIT_FAILURE);
 
-	}
-	*/ 
+	        }
 
-	if (pthread_create(&runner,NULL,startDebugger,cpu)) {
+		break;
 
-		printf("ERROR: Failed to create Runner Thread\n");
-		exit(EXIT_FAILURE);
+		case 0:
 
-	}
+		if (pthread_create(&runner, NULL, runCPU, runnerArgs)) {
 
+			printf("ERROR: Failed to create Runner Thread\n");
+			exit(EXIT_FAILURE);
 
+	        }
+
+		if (pthread_create(&display, NULL, printDisplay, NULL)) {
+
+			printf("ERROR: Failed to create Display Thread\n");
+			exit(EXIT_FAILURE);
+
+		}
+
+		break;
+
+	};
+	
 	if (pthread_create(&io, NULL, runIOConnector, ioArgs)) {
 
-		printf("ERROR: Failed to create I/O Thread\n");
-		exit(EXIT_FAILURE);
+		        printf("ERROR: Failed to create I/O Thread\n");
+		        exit(EXIT_FAILURE);
 
 	}
 
 	if (pthread_join(io, NULL)) {
 
 		printf("ERROR: joining thread I/O\n");
+		exit(EXIT_FAILURE);
+
+	}
+
+	if (pthread_join(display,NULL)) {
+
+		printf("ERROR: joining thread Display\n");
 		exit(EXIT_FAILURE);
 
 	}
@@ -716,7 +751,7 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 
 int main (int argc, char **argv) {
 
-	runSimulation(10000000,10000000,1000000,argv[1],1000);
+	runSimulation(10000000,10000000,-1,argv[1],1000, 0);
 
 	return 0;
 
