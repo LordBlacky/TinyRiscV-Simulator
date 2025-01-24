@@ -1,6 +1,7 @@
 # Compiled
 **/compiled.txt
 **/debugger_info.txt
+**/asm
 
 # Prerequisites
 *.d

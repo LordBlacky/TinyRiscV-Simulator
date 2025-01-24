@@ -391,7 +391,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			break;
 		case JALR:
 			wR(reg,rd,(pgrm->pc + 4));
-			pgrm->pc = ((rR(reg,rs2) + rs1) & 0xfffffffe);
+			pgrm->pc = ((rR(reg,rs1) + rs2) & 0xfffffffe);
 			break;
 
 		//also add supported pseudo instruction
