@@ -727,12 +727,13 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 		exit(EXIT_FAILURE);
 
 	}
+	if (debugger == 0) {
+		if (pthread_join(display,NULL)) {
 
-	if (pthread_join(display,NULL)) {
+			printf("ERROR: joining thread Display\n");
+			exit(EXIT_FAILURE);
 
-		printf("ERROR: joining thread Display\n");
-		exit(EXIT_FAILURE);
-
+		}
 	}
 
 	if (pthread_join(runner, NULL)) {
