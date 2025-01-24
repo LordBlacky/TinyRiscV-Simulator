@@ -164,10 +164,10 @@ def compile(input_file, output_file):
         parts = re.split(r",? |,|\(", lines[i].strip())
         # if bracket syntax is used (e.g "jalr x1 0(x2)"):
         # swap second and third argument
-        if (re.match(r"\d\(.+\)", lines[i])):
-            t = parts[1]
-            parts[1] = parts[2]
-            parts[2] = t
+        if (re.search(r"\d\(.+\)", lines[i])):
+            t = parts[2]
+            parts[2] = parts[3]
+            parts[3] = t
 
         if (parts[0] == ''):
             parts[0] = "EMPTY"  # to fill empty lines with zeros
