@@ -159,7 +159,7 @@ void *startDebugger (void *args) {
 
     refresh();
     wrefresh(win);
-    getch();
+    //getch();
   }
 
   // ------------------------------------------

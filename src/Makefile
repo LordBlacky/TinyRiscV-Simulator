@@ -1,16 +1,22 @@
 simulator:
-	gcc display.c debugger.c tinyriscvsimulator.c -o simulator -lncurses
+	make clean
+	make compile_asm
+	make compile
 	./simulator compiled.txt 1
 
-make compile_asm:
+compile_asm:
 	python3 compiler.py
+
+compile:
+	gcc display.c debugger.c tinyriscvsimulator.c -o simulator -lncurses
 
 justcpu:
-	python3 compiler.py
-	gcc display.c debugger.c tinyriscvsimulator.c -o simulator -lncurses
+	make clean
+	make compile_asm
+	make compile
 	./simulator compiled.txt 0
 
-make clean:
+clean:
 	touch simulator
 	touch compiled.txt
 	touch debugger_info.txt
