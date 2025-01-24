@@ -2,6 +2,7 @@
 **/compiled.txt
 **/debugger_info.txt
 **/asm
+**/simulator
 
 # Prerequisites
 *.d
