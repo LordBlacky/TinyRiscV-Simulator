@@ -27,6 +27,8 @@
 
 const int SLEEPTIME = 1000;
 const int CYCLES_PER_SLEEP = 1000;
+const int RES_X = 270;
+const int RES_Y = 70;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -41,7 +43,7 @@ void print_instructions(int line) {
                       : (line_count);
   for (size_t i = line; i < max_lines; i++) {
 
-    wmove(win, 0 + i - line, RIGHT_WINDOW_PADDING);
+    wmove(win, 1 + i - line, RIGHT_WINDOW_PADDING);
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 }
@@ -68,10 +70,11 @@ void printRegister(Register *reg) {
 }
 
 void print_display(char (*display)[COLS + 1]) {
-  wmove(win, 0, 0);
+  wmove(win, 1, 1);
   int i;
   for (i = 0; i < PAGES * 8; i++) {
     wprintw(win, "%s\n", display[i]);
+    wmove(win, i+1, 1);
   }
 }
 
@@ -124,9 +127,7 @@ void init_screen() {
   // make curser invisible
   curs_set(0);
 
-  int res_y = 70;
-  int res_x = 200;
-  win = newwin(res_y, res_x, 0, 0);
+  win = newwin(RES_Y, RES_X, 0, 0);
   box(win, 0, 0);
   wmove(win, 1, 1);
   refresh();
@@ -151,6 +152,7 @@ void *threadOne(void *args) {
     print_instructions(cpu->pgrm->pc / 4);
     printRegister(cpu->reg);
 
+    box(win, 0, 0);
     refresh();
     wrefresh(win);
   }
