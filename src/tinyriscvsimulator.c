@@ -361,11 +361,11 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			pgrm->pc += 4;
 			break;
 		case LW:
-			wR(reg,rd,(rM(mem,rR(reg,rs2) + rs1)));
+			wR(reg,rd,(rM(mem,rR(reg,rs1) + rs2)));
 			pgrm->pc += 4;
 			break;
 		case SW:
-			wM(mem,rR(reg,rs2) + rs1,rR(reg,rd));
+			wM(mem,rR(reg,rs1) + rs2,rR(reg,rd));
 			pgrm->pc += 4;
 			break;
 		case BEQ:
