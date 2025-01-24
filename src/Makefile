@@ -5,6 +5,11 @@ simulator:
 make compile_asm:
 	python3 compiler.py
 
+justcpu:
+	python3 compiler.py
+	gcc display.c debugger.c tinyriscvsimulator.c -o simulator -lncurses
+	./simulator compiled.txt 0
+
 make clean:
 	touch simulator
 	touch compiled.txt
