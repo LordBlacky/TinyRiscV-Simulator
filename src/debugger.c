@@ -8,11 +8,12 @@
 
 #include <curses.h>
 #include <ncurses.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+#include <unistd.h>
 
 #include "cpu.h"
 #include "display.h"
@@ -24,6 +25,9 @@
 #define INSTRUCTION_LINES 10 // Number of instructions shown when debugging
 #define NUMBER_OF_INSTRUCTIONS 20
 
+const int SLEEPTIME = 1000;
+const int CYCLES_PER_SLEEP = 1000;
+
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
 int line_count = 0;
@@ -32,22 +36,22 @@ WINDOW *win;
 
 void print_instructions(int line) {
   // Print all lines
-  int max_lines = (line + NUMBER_OF_INSTRUCTIONS) < (line_count) ? (line + NUMBER_OF_INSTRUCTIONS) : (line_count);
+  int max_lines = (line + NUMBER_OF_INSTRUCTIONS) < (line_count)
+                      ? (line + NUMBER_OF_INSTRUCTIONS)
+                      : (line_count);
   for (size_t i = line; i < max_lines; i++) {
 
     wmove(win, 0 + i - line, RIGHT_WINDOW_PADDING);
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
-
 }
 
 void print_display(char (*display)[COLS + 1]) {
   wmove(win, 0, 0);
   int i;
-  for(i = 0; i < PAGES * 8; i++){
+  for (i = 0; i < PAGES * 8; i++) {
     wprintw(win, "%s\n", display[i]);
   }
-
 }
 
 void load_debug_file() {
@@ -116,58 +120,63 @@ void init_debugger() {
   endwin();
 }
 
-void *threadOne (void *args) {
+void *threadOne(void *args) {
+
+  CPU *cpu = (CPU *)args;
+
+  while (1) {
+
+    print_display(getPixels());
+    print_instructions(cpu->pgrm->pc / 4);
+
+    refresh();
+    wrefresh(win);
+  }
+
+  return NULL;
+}
+
+void *threadTwo(void *args) {
 
   CPU *cpu = (CPU *)args;
 
   // CODE HERE
 
   return NULL;
-
 }
 
-void *threadTwo (void *args) {
-
-  CPU *cpu = (CPU *)args;
-
-  // CODE HERE
-
-  return NULL;
-
-}
-
-void *startDebugger (void *args) {
+void *startDebugger(void *args) {
 
   CPU *cpu = (CPU *)args;
   printf("Started running Debugger\n");
 
-  pthread_t one, two;
-
-  pthread_create(&one,NULL,threadOne,args);
-  pthread_create(&two,NULL,threadTwo,args);
-
- // -------------------------------------------
-
   init_debugger();
   print_instructions(0);
-  refresh();wrefresh(win);
+  refresh();
+  wrefresh(win);
+
+  pthread_t one, two;
+
+  pthread_create(&one, NULL, threadOne, args);
+  pthread_create(&two, NULL, threadTwo, args);
+
+  // -------------------------------------------
+
   getch();
   while (1) {
-    runCommand(cpu);
-    print_display(getPixels());
-    print_instructions(cpu->pgrm->pc/4);
-
-    refresh();
-    wrefresh(win);
-    //getch();
+    int i;
+    for (i = 0; i < CYCLES_PER_SLEEP; i++) {
+      runCommand(cpu);
+    }
+    usleep(SLEEPTIME);
+    // getch();
   }
 
   // ------------------------------------------
-  
-  pthread_join(one,NULL);
-  pthread_join(two,NULL);
+
+  pthread_join(one, NULL);
+  pthread_join(two, NULL);
 
   printf("Stopped running Debugger\n");
   return NULL;
 }
-
