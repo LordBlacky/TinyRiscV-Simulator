@@ -1,0 +1,73 @@
+  _____   _                           ____    _               __     __ ||
+ |_   _| (_)  _ __    _   _          |  _ \  (_)  ___    ___  \ \   / / ||
+   | |   | | | '_ \  | | | |  _____  | |_) | | | / __|  / __|  \ \ / /  ||
+   | |   | | | | | | | |_| | |_____| |  _ <  | | \__ \ | (__    \ V /   ||
+   |_|   |_| |_| |_|  \__, |         |_| \_\ |_| |___/  \___|    \_/    ||
+                      |___/                                             ||
+  ____    _                       _           _                         ||
+ / ___|  (_)  _ __ ___    _   _  | |   __ _  | |_    ___    _ __        ||
+ \___ \  | | | '_ ` _ \  | | | | | |  / _` | | __|  / _ \  | '__|       ||
+  ___) | | | | | | | | | | |_| | | | | (_| | | |_  | (_) | | |          ||
+ |____/  |_| |_| |_| |_|  \__,_| |_|  \__,_|  \__|  \___/  |_|          ||
+                                                                        ||
+------------------------------------------------------------------------//
+-----------------------------------------------------------------------//
+
+
+--------------+
+DOCUMENTATION |
+--------------+
+
+PROJECT: https://github.com/LordBlacky/TinyRiscV-Simulator
+
+------------------+
+TABLE OF CONTENTS |
+------------------+
+
+  1. Supported Assembler Code (Compiler.py)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------+
+1. Supported Assembler Code (Compiler.py) |
+------------------------------------------+
+
+General syntax:
+
+   - instruction rd, rs1, rs2 ; instruction rd, rs1, imm ; instruction rs1, rs2, imm
+
+      -> Gets compiled to: 'instruction a b c' in same order
+
+   - instruction rd, imm
+
+      -> Gets compiled to: 'instruction a b 0' in same order
+
+   - instruction rd, imm(rs1)
+
+      -> Gets compiled to: 'instruction rd rs1 imm' in flipped order
+
+
+
+
+Supported instructions (special cases):
+
+   Load-Store Instructions:
+
+      LW, SW are supported only in this notation: lw/sw rd, imm(rs1)
+
+   Jump Instructions:
+
+      JALR is supported in both notations: jalr rd, imm(rs1) ; jalr rd, rs1, imm
+
+

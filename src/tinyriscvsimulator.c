@@ -752,7 +752,7 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 
 int main (int argc, char **argv) {
 
-	runSimulation(10000000,10000000,-1,argv[1],1000, 0);
+	runSimulation(10000000,10000000,-1,argv[1],1000, atoi(argv[2]));
 
 	return 0;
 
