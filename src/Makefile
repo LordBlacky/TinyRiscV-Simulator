@@ -1,6 +1,6 @@
 simulator:
 	gcc display.c debugger.c tinyriscvsimulator.c -o simulator -lncurses
-	./simulator compiled.txt
+	./simulator compiled.txt 1
 
 make compile_asm:
 	python3 compiler.py

@@ -6,14 +6,13 @@
  *
  */
 
-//------------ REQUIRED FUNCTIONS -------------
-
 #include <curses.h>
 #include <ncurses.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "cpu.h"
 #include "display.h"
@@ -117,23 +116,38 @@ void init_debugger() {
   endwin();
 }
 
-void *startDebugger(void *args);
+void *threadOne (void *args) {
 
-//---------------------------------------------
+  CPU *cpu = (CPU *)args;
 
-void *startDebugger(void *args) {
+  // CODE HERE
+
+  return NULL;
+
+}
+
+void *threadTwo (void *args) {
+
+  CPU *cpu = (CPU *)args;
+
+  // CODE HERE
+
+  return NULL;
+
+}
+
+void *startDebugger (void *args) {
 
   CPU *cpu = (CPU *)args;
   printf("Started running Debugger\n");
 
-  // PLACE CODE HERE
-  //
-  // USEFULL FUNCTIONS
-  //
-  // char *getPixels (); -> Display
-  //
-  // void runCommand (CPU *cpu); -> CPU
-  //
+  pthread_t one, two;
+
+  pthread_create(&one,NULL,threadOne,args);
+  pthread_create(&two,NULL,threadTwo,args);
+
+ // -------------------------------------------
+
   init_debugger();
   print_instructions(0);
   refresh();wrefresh(win);
@@ -147,6 +161,11 @@ void *startDebugger(void *args) {
     wrefresh(win);
     getch();
   }
+
+  // ------------------------------------------
+  
+  pthread_join(one,NULL);
+  pthread_join(two,NULL);
 
   printf("Stopped running Debugger\n");
   return NULL;
