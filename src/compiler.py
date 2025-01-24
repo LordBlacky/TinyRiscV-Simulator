@@ -54,7 +54,7 @@ def expand_macros(input_file, output_file):
         def get_replaced_text(self, input_args):
             if (len(input_args) != len(self.args)):
                 print(
-                    f"Error: arguments given for {self.name} does not match defined number")
+                    f"Error: arguments given for {self.name} does not match defined number\n got {input_args}, expected {self.args}")
 
             to_insert = self.text
             for i in range(len(self.args)):
@@ -95,8 +95,10 @@ def expand_macros(input_file, output_file):
                 print("macro: ", current_macro_name)
 
                 # parse arguments:
-                args_raw = re.sub(mac_pattern, "", s)
-                args = re.split(r"\s*,\s*|\s+", args_raw.strip())
+                args_raw = re.sub(mac_pattern, "", s).strip()
+                args = []
+                if (args_raw != ""):  # check for if there are no arguments
+                    args = re.split(r"\s*,\s*|\s+", args_raw)
 
                 # create macro object
                 macros[current_macro_name] = Macro(
