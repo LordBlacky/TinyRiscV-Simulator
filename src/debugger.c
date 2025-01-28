@@ -32,6 +32,8 @@ const int RES_Y = 70;
 int mem_base_addr = 0;
 
 int nextCommand = 0;
+int nextBreakpoint = 0;
+int justRun = 0;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -54,7 +56,7 @@ void print_instructions(int line) {
 
   for (size_t i = line; i < max_lines; i++) {
 
-    wmove(win, 1 + i - line, RIGHT_WINDOW_PADDING+2);
+    wmove(win, 1 + i - line, RIGHT_WINDOW_PADDING + 2);
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 }
@@ -270,6 +272,12 @@ void *threadTwo(void *args) {
     case 'i':
       mem_base_addr--;
       break;
+    case 'b':
+      nextBreakpoint = 1;
+      break;
+    case 'r':
+      justRun = 1;
+      break;
     case 'p':
       exit(EXIT_SUCCESS);
       break;
@@ -299,18 +307,17 @@ void *startDebugger(void *args) {
 
   while (1) {
     int i;
-    getch();
     for (i = 0; i < CYCLES_PER_SLEEP; i++) {
-      int j;
       // could upgrade breakpoint lookup to binary search
-      for (j = 0; j < breakpoint_count; j++) {
+
+      for (int j = 0; j < breakpoint_count; j++) {
         if (breakpoints[j] ==
             cpu->pgrm->pc / 4 + 1) { // line numbers are 1-indexed
-          getch();
+          nextBreakpoint = 0;
         }
       }
 
-      while (nextCommand == 0) {
+      while ((nextCommand == 0) && (nextBreakpoint == 0) && (justRun == 0)) {
       }
       runCommand(cpu);
       nextCommand = 0;
