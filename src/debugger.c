@@ -31,6 +31,8 @@ const int RES_X = 270;
 const int RES_Y = 70;
 int mem_base_addr = 0;
 
+int nextCommand = 0;
+
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
 int line_count = 0;
@@ -190,7 +192,17 @@ void *threadTwo(void *args) {
 
   CPU *cpu = (CPU *)args;
 
-  // CODE HERE
+  while (1) {
+
+    char in = getch();
+    switch(in) {
+      case 'n': nextCommand = 1; break;
+      case 'u': mem_base_addr++; break;
+      case 'i': mem_base_addr--; break;
+      case 'p': exit(EXIT_SUCCESS); break;
+    };
+
+  }
 
   return NULL;
 }
@@ -212,11 +224,15 @@ void *startDebugger(void *args) {
 
   // -------------------------------------------
 
-  getch();
   while (1) {
     int i;
+    getch();
     for (i = 0; i < CYCLES_PER_SLEEP; i++) {
+      while (nextCommand == 0) {
+
+      }
       runCommand(cpu);
+      nextCommand = 0;
     }
     usleep(SLEEPTIME);
     // getch();
