@@ -60,11 +60,11 @@ void printRegister(Register *reg) {
     int i = 0;
     for (;i < reg->size; i += 4) {
         wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
-        wprintw(win, "x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n",
-                i, reg->data[i],
-                i + 1, reg->data[i + 1],
-                i + 2, reg->data[i + 2],
-                i + 3, reg->data[i + 3]);
+        wprintw(win, "x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x\n",
+                i, (uint32_t)reg->data[i],
+                i + 1, (uint32_t)reg->data[i + 1],
+                i + 2, (uint32_t)reg->data[i + 2],
+                i + 3, (uint32_t)reg->data[i + 3]);
     }
     wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
     wprintw(win, "=====================================================================================\n");
@@ -82,13 +82,15 @@ void printMemory(Memory *mem, int addr) {
     int i = 0;
     for (;i < 64; i += 4) {
         wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
-        wprintw(win, "%-2d: %12d | %-2d: %12d | %-2d: %12d | %-2d: %12d\n",
-                addr + i, memaddr[addr + i],
-                addr + i + 1, memaddr[addr + i + 1],
-                addr + i + 2, memaddr[addr + i + 2],
-                addr + i + 3, memaddr[addr + i + 3]);
+        wprintw(win, "%-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x\n",
+                addr + i, (uint8_t)memaddr[addr + i],
+                addr + i + 1, (uint8_t)memaddr[addr + i + 1],
+                addr + i + 2, (uint8_t)memaddr[addr + i + 2],
+                addr + i + 3, (uint8_t)memaddr[addr + i + 3]);
     }
-    wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
+    wmove(win,42+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",(uint8_t)mem->GPIO_IN,(uint8_t)mem->GPIO_OUT,(uint32_t)mem->DISPLAY,(uint32_t)mem->I2C_REST);
+    wmove(win,43+i/4, RIGHT_WINDOW_PADDING);
     wprintw(win, "=====================================================================================\n");
 }
 
