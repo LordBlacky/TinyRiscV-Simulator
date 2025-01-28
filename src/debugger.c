@@ -33,6 +33,7 @@ int mem_base_addr = 0;
 
 int nextCommand = 0;
 int nextBreakpoint = 0;
+int justRun = 0;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -253,6 +254,7 @@ void *threadTwo(void *args) {
       case 'u': mem_base_addr++; break;
       case 'i': mem_base_addr--; break;
       case 'b': nextBreakpoint = 1; break;
+      case 'r': justRun = 1; break;
       case 'p': exit(EXIT_SUCCESS); break;
     };
 
@@ -281,7 +283,6 @@ void *startDebugger(void *args) {
 
   while (1) {
     int i;
-    getch();
     for (i = 0; i < CYCLES_PER_SLEEP; i++) {
       // could upgrade breakpoint lookup to binary search
 
@@ -292,7 +293,7 @@ void *startDebugger(void *args) {
         }
       }
 
-      while ( (nextCommand == 0) && (nextBreakpoint == 0) ) {
+      while ( (nextCommand == 0) && (nextBreakpoint == 0) && (justRun == 0) ) {
 
       }
       runCommand(cpu);
