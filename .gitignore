@@ -3,6 +3,7 @@
 **/debugger_info.txt
 **/asm
 **/simulator
+**/breakpoint_info.txt
 
 # Prerequisites
 *.d

@@ -223,6 +223,23 @@ def get_arg_id(arg: str, labels: dict, current_line):
     print(f"Error: '{arg}' can't be resolved")
 
 
+def get_breakpoints(input_file):
+    # Puts the line numbers that contain '#breakpoint' into the breakpoint_info.txt
+    # whitespace seperated
+
+    # Open the input file and read its lines
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
+
+    # Collect line numbers containing '#breakpoint'
+    breakpoints = [str(index + 1)
+                   for index, line in enumerate(lines) if '#breakpoint' in line]
+
+    # Write the collected line numbers into 'breakpoint_info.txt'
+    with open('breakpoint_info.txt', 'w') as output_file:
+        output_file.write(' '.join(breakpoints))
+
+
 def get_inst_id(arg: str):
     arg = arg.upper()
     return instructions_dict[arg]
@@ -270,4 +287,5 @@ if __name__ == "__main__":
 
     ranges = concatenate_files(output_file, *file_paths)
     expand_macros(output_file, debug_file)
+    get_breakpoints(debug_file)
     compile(debug_file, output_file)

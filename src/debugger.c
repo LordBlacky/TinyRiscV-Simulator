@@ -34,6 +34,10 @@ const int RES_Y = 70;
 char *lines[MAX_LINES];
 int line_count = 0;
 
+// Array of integers, holding linenumbers of breakpoints
+int *breakpoints;
+int breakpoint_count;
+
 WINDOW *win;
 
 void print_instructions(int line) {
@@ -49,24 +53,25 @@ void print_instructions(int line) {
 }
 
 void printRegister(Register *reg) {
-    wmove(win, 25, RIGHT_WINDOW_PADDING); // Adjust the position as needed
-    wprintw(win, "=====================================================================================\n");
-    wmove(win,26, RIGHT_WINDOW_PADDING);
-    wprintw(win, "CURRENT REGISTER VIEW\n");
-    wmove(win,27, RIGHT_WINDOW_PADDING);
-    wprintw(win, "-------------------------------------------------------------------------------------\n");
+  wmove(win, 25, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+  wprintw(win, "==============================================================="
+               "======================\n");
+  wmove(win, 26, RIGHT_WINDOW_PADDING);
+  wprintw(win, "CURRENT REGISTER VIEW\n");
+  wmove(win, 27, RIGHT_WINDOW_PADDING);
+  wprintw(win, "---------------------------------------------------------------"
+               "----------------------\n");
 
-    int i = 0;
-    for (;i < reg->size; i += 4) {
-        wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
-        wprintw(win, "x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n",
-                i, reg->data[i],
-                i + 1, reg->data[i + 1],
-                i + 2, reg->data[i + 2],
-                i + 3, reg->data[i + 3]);
-    }
-    wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
-    wprintw(win, "=====================================================================================\n");
+  int i = 0;
+  for (; i < reg->size; i += 4) {
+    wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n", i,
+            reg->data[i], i + 1, reg->data[i + 1], i + 2, reg->data[i + 2],
+            i + 3, reg->data[i + 3]);
+  }
+  wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
+  wprintw(win, "==============================================================="
+               "======================\n");
 }
 
 void print_display(char (*display)[COLS + 1]) {
@@ -74,7 +79,7 @@ void print_display(char (*display)[COLS + 1]) {
   int i;
   for (i = 0; i < PAGES * 8; i++) {
     wprintw(win, "%s\n", display[i]);
-    wmove(win, i+1, 1);
+    wmove(win, i + 1, 1);
   }
 }
 
@@ -112,11 +117,56 @@ void load_debug_file() {
   return;
 }
 
+void read_breakpoint_info() {
+  const char *filename = "breakpoint_info.txt";
+  FILE *file = fopen(filename, "r");
+  if (file == NULL) {
+    perror("Error opening file");
+    breakpoint_count = 0;
+    return;
+  }
+
+  // Allocate initial space for the array
+  int capacity = 10;
+  int *line_numbers = malloc(capacity * sizeof(int));
+  if (line_numbers == NULL) {
+    perror("Memory allocation error");
+    fclose(file);
+    breakpoint_count = 0;
+    return;
+  }
+
+  breakpoint_count = 0;
+  int num;
+  while (fscanf(file, "%d", &num) == 1) {
+    // Expand the array if needed
+    if (breakpoint_count >= capacity) {
+      capacity *= 2;
+      int *temp = realloc(line_numbers, capacity * sizeof(int));
+      if (temp == NULL) {
+        perror("Memory reallocation error");
+        free(line_numbers);
+        fclose(file);
+        breakpoint_count = 0;
+        return;
+      }
+      line_numbers = temp;
+    }
+
+    line_numbers[breakpoint_count] = num;
+    (breakpoint_count)++;
+  }
+
+  fclose(file);
+  breakpoints = line_numbers;
+}
+
 void free_lines() {
   // Free allocated memory
   for (size_t i = 0; i < line_count; i++) {
     free(lines[i]);
   }
+  free(breakpoints);
 }
 
 void init_screen() {
@@ -137,6 +187,7 @@ void init_screen() {
 void init_debugger() {
   init_screen();
   load_debug_file();
+  read_breakpoint_info();
 
   getch();
   endwin();
@@ -178,6 +229,7 @@ void *startDebugger(void *args) {
   print_instructions(0);
   refresh();
   wrefresh(win);
+  getch();
 
   pthread_t one, two;
 
@@ -186,14 +238,21 @@ void *startDebugger(void *args) {
 
   // -------------------------------------------
 
-  getch();
   while (1) {
     int i;
     for (i = 0; i < CYCLES_PER_SLEEP; i++) {
+      int j;
+      // could upgrade breakpoint lookup to binary search
+      for (j = 0; j < breakpoint_count; j++) {
+        if (breakpoints[j] ==
+            cpu->pgrm->pc / 4 + 1) { // line numbers are 1-indexed
+          getch();
+        }
+      }
+
       runCommand(cpu);
     }
-    usleep(SLEEPTIME);
-    // getch();
+    // usleep(SLEEPTIME);
   }
 
   // ------------------------------------------
