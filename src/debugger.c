@@ -20,7 +20,7 @@
 
 #define MAX_LINES 1024           // Maximum number of lines
 #define MAX_LINE_LENGTH 1024     // Maximum length of a single line
-#define RIGHT_WINDOW_PADDING 140 // Distance to the right side debug info
+#define RIGHT_WINDOW_PADDING 136 // Distance to the right side debug info
 #define BOTTOM_WINDOW_PADDING 70
 #define INSTRUCTION_LINES 10 // Number of instructions shown when debugging
 #define NUMBER_OF_INSTRUCTIONS 20
@@ -48,9 +48,13 @@ void print_instructions(int line) {
   int max_lines = (line + NUMBER_OF_INSTRUCTIONS) < (line_count)
                       ? (line + NUMBER_OF_INSTRUCTIONS)
                       : (line_count);
+  //
+  wmove(win, 1, RIGHT_WINDOW_PADDING);
+  wprintw(win, "->");
+
   for (size_t i = line; i < max_lines; i++) {
 
-    wmove(win, 1 + i - line, RIGHT_WINDOW_PADDING);
+    wmove(win, 1 + i - line, RIGHT_WINDOW_PADDING+2);
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 }
@@ -65,41 +69,46 @@ void printRegister(Register *reg) {
   wprintw(win, "---------------------------------------------------------------"
                "----------------------\n");
 
-    int i = 0;
-    for (;i < reg->size; i += 4) {
-        wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
-        wprintw(win, "x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x\n",
-                i, (uint32_t)reg->data[i],
-                i + 1, (uint32_t)reg->data[i + 1],
-                i + 2, (uint32_t)reg->data[i + 2],
-                i + 3, (uint32_t)reg->data[i + 3]);
-    }
-    wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
-    wprintw(win, "=====================================================================================\n");
+  int i = 0;
+  for (; i < reg->size; i += 4) {
+    wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
+    wprintw(win,
+            "x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x\n",
+            i, (uint32_t)reg->data[i], i + 1, (uint32_t)reg->data[i + 1], i + 2,
+            (uint32_t)reg->data[i + 2], i + 3, (uint32_t)reg->data[i + 3]);
+  }
+  wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
+  wprintw(win, "==============================================================="
+               "======================\n");
 }
 
 void printMemory(Memory *mem, int addr) {
-    int8_t *memaddr = (int8_t *)(mem->data);
-    wmove(win, 38, RIGHT_WINDOW_PADDING); // Adjust the position as needed
-    wprintw(win, "=====================================================================================\n");
-    wmove(win,39, RIGHT_WINDOW_PADDING);
-    wprintw(win, "CURRENT MEMORY VIEW (LITTLE ENDIAN!)\n");
-    wmove(win,40, RIGHT_WINDOW_PADDING);
-    wprintw(win, "-------------------------------------------------------------------------------------\n");
+  int8_t *memaddr = (int8_t *)(mem->data);
+  wmove(win, 38, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+  wprintw(win, "==============================================================="
+               "==========================\n");
+  wmove(win, 39, RIGHT_WINDOW_PADDING);
+  wprintw(win, "CURRENT MEMORY VIEW (LITTLE ENDIAN!)\n");
+  wmove(win, 40, RIGHT_WINDOW_PADDING);
+  wprintw(win, "---------------------------------------------------------------"
+               "--------------------------\n");
 
-    int i = 0;
-    for (;i < 64; i += 4) {
-        wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
-        wprintw(win, "%-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x\n",
-                addr + i, (uint8_t)memaddr[addr + i],
-                addr + i + 1, (uint8_t)memaddr[addr + i + 1],
-                addr + i + 2, (uint8_t)memaddr[addr + i + 2],
-                addr + i + 3, (uint8_t)memaddr[addr + i + 3]);
-    }
-    wmove(win,42+i/4, RIGHT_WINDOW_PADDING);
-    wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",(uint8_t)mem->GPIO_IN,(uint8_t)mem->GPIO_OUT,(uint32_t)mem->DISPLAY,(uint32_t)mem->I2C_REST);
-    wmove(win,43+i/4, RIGHT_WINDOW_PADDING);
-    wprintw(win, "=====================================================================================\n");
+  int i = 0;
+  for (; i < 64; i += 4) {
+    wmove(win, 41 + i / 4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "%-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x\n",
+            addr + i, (uint8_t)memaddr[addr + i], addr + i + 1,
+            (uint8_t)memaddr[addr + i + 1], addr + i + 2,
+            (uint8_t)memaddr[addr + i + 2], addr + i + 3,
+            (uint8_t)memaddr[addr + i + 3]);
+  }
+  wmove(win, 42 + i / 4, RIGHT_WINDOW_PADDING);
+  wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",
+          (uint8_t)mem->GPIO_IN, (uint8_t)mem->GPIO_OUT, (uint32_t)mem->DISPLAY,
+          (uint32_t)mem->I2C_REST);
+  wmove(win, 43 + i / 4, RIGHT_WINDOW_PADDING);
+  wprintw(win, "==============================================================="
+               "==========================\n");
 }
 
 void print_display(char (*display)[COLS + 1]) {
@@ -109,6 +118,9 @@ void print_display(char (*display)[COLS + 1]) {
     wprintw(win, "%s\n", display[i]);
     wmove(win, i + 1, 1);
   }
+  // draw box around display
+  whline(win, 0, COLS);
+  mvwvline(win, 1, COLS + 1, 0, PAGES * 8 - 1);
 }
 
 void load_debug_file() {
@@ -201,7 +213,8 @@ void init_screen() {
   initscr();
   cbreak();
   noecho();
-
+  start_color();
+  init_pair(1, COLOR_BLACK, COLOR_WHITE);
   // make curser invisible
   curs_set(0);
 
@@ -230,7 +243,7 @@ void *threadOne(void *args) {
     print_display(getPixels());
     print_instructions(cpu->pgrm->pc / 4);
     printRegister(cpu->reg);
-    printMemory(cpu->shared->mem,mem_base_addr);
+    printMemory(cpu->shared->mem, mem_base_addr);
 
     box(win, 0, 0);
     refresh();
@@ -247,13 +260,20 @@ void *threadTwo(void *args) {
   while (1) {
 
     char in = getch();
-    switch(in) {
-      case 'n': nextCommand = 1; break;
-      case 'u': mem_base_addr++; break;
-      case 'i': mem_base_addr--; break;
-      case 'p': exit(EXIT_SUCCESS); break;
+    switch (in) {
+    case 'n':
+      nextCommand = 1;
+      break;
+    case 'u':
+      mem_base_addr++;
+      break;
+    case 'i':
+      mem_base_addr--;
+      break;
+    case 'p':
+      exit(EXIT_SUCCESS);
+      break;
     };
-
   }
 
   return NULL;
@@ -286,12 +306,11 @@ void *startDebugger(void *args) {
       for (j = 0; j < breakpoint_count; j++) {
         if (breakpoints[j] ==
             cpu->pgrm->pc / 4 + 1) { // line numbers are 1-indexed
-            getch();
+          getch();
         }
       }
 
       while (nextCommand == 0) {
-
       }
       runCommand(cpu);
       nextCommand = 0;
