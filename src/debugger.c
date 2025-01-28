@@ -29,6 +29,9 @@ const int SLEEPTIME = 1000;
 const int CYCLES_PER_SLEEP = 1000;
 const int RES_X = 270;
 const int RES_Y = 70;
+int mem_base_addr = 0;
+
+int nextCommand = 0;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -62,16 +65,41 @@ void printRegister(Register *reg) {
   wprintw(win, "---------------------------------------------------------------"
                "----------------------\n");
 
-  int i = 0;
-  for (; i < reg->size; i += 4) {
-    wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
-    wprintw(win, "x%-2d: %12d | x%-2d: %12d | x%-2d: %12d | x%-2d: %12d\n", i,
-            reg->data[i], i + 1, reg->data[i + 1], i + 2, reg->data[i + 2],
-            i + 3, reg->data[i + 3]);
-  }
-  wmove(win, 28 + i / 4, RIGHT_WINDOW_PADDING);
-  wprintw(win, "==============================================================="
-               "======================\n");
+    int i = 0;
+    for (;i < reg->size; i += 4) {
+        wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
+        wprintw(win, "x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x\n",
+                i, (uint32_t)reg->data[i],
+                i + 1, (uint32_t)reg->data[i + 1],
+                i + 2, (uint32_t)reg->data[i + 2],
+                i + 3, (uint32_t)reg->data[i + 3]);
+    }
+    wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "=====================================================================================\n");
+}
+
+void printMemory(Memory *mem, int addr) {
+    int8_t *memaddr = (int8_t *)(mem->data);
+    wmove(win, 38, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+    wprintw(win, "=====================================================================================\n");
+    wmove(win,39, RIGHT_WINDOW_PADDING);
+    wprintw(win, "CURRENT MEMORY VIEW (LITTLE ENDIAN!)\n");
+    wmove(win,40, RIGHT_WINDOW_PADDING);
+    wprintw(win, "-------------------------------------------------------------------------------------\n");
+
+    int i = 0;
+    for (;i < 64; i += 4) {
+        wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
+        wprintw(win, "%-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x\n",
+                addr + i, (uint8_t)memaddr[addr + i],
+                addr + i + 1, (uint8_t)memaddr[addr + i + 1],
+                addr + i + 2, (uint8_t)memaddr[addr + i + 2],
+                addr + i + 3, (uint8_t)memaddr[addr + i + 3]);
+    }
+    wmove(win,42+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",(uint8_t)mem->GPIO_IN,(uint8_t)mem->GPIO_OUT,(uint32_t)mem->DISPLAY,(uint32_t)mem->I2C_REST);
+    wmove(win,43+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "=====================================================================================\n");
 }
 
 void print_display(char (*display)[COLS + 1]) {
@@ -202,6 +230,7 @@ void *threadOne(void *args) {
     print_display(getPixels());
     print_instructions(cpu->pgrm->pc / 4);
     printRegister(cpu->reg);
+    printMemory(cpu->shared->mem,mem_base_addr);
 
     box(win, 0, 0);
     refresh();
@@ -215,7 +244,17 @@ void *threadTwo(void *args) {
 
   CPU *cpu = (CPU *)args;
 
-  // CODE HERE
+  while (1) {
+
+    char in = getch();
+    switch(in) {
+      case 'n': nextCommand = 1; break;
+      case 'u': mem_base_addr++; break;
+      case 'i': mem_base_addr--; break;
+      case 'p': exit(EXIT_SUCCESS); break;
+    };
+
+  }
 
   return NULL;
 }
@@ -240,17 +279,22 @@ void *startDebugger(void *args) {
 
   while (1) {
     int i;
+    getch();
     for (i = 0; i < CYCLES_PER_SLEEP; i++) {
       int j;
       // could upgrade breakpoint lookup to binary search
       for (j = 0; j < breakpoint_count; j++) {
         if (breakpoints[j] ==
             cpu->pgrm->pc / 4 + 1) { // line numbers are 1-indexed
-          getch();
+            getch();
         }
       }
 
+      while (nextCommand == 0) {
+
+      }
       runCommand(cpu);
+      nextCommand = 0;
     }
     // usleep(SLEEPTIME);
   }
