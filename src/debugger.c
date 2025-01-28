@@ -29,6 +29,7 @@ const int SLEEPTIME = 1000;
 const int CYCLES_PER_SLEEP = 1000;
 const int RES_X = 270;
 const int RES_Y = 70;
+int mem_base_addr = 0;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -66,6 +67,28 @@ void printRegister(Register *reg) {
                 i + 3, reg->data[i + 3]);
     }
     wmove(win,28+i/4, RIGHT_WINDOW_PADDING);
+    wprintw(win, "=====================================================================================\n");
+}
+
+void printMemory(Memory *mem, int addr) {
+    int8_t *memaddr = (int8_t *)(mem->data);
+    wmove(win, 38, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+    wprintw(win, "=====================================================================================\n");
+    wmove(win,39, RIGHT_WINDOW_PADDING);
+    wprintw(win, "CURRENT MEMORY VIEW (LITTLE ENDIAN!)\n");
+    wmove(win,40, RIGHT_WINDOW_PADDING);
+    wprintw(win, "-------------------------------------------------------------------------------------\n");
+
+    int i = 0;
+    for (;i < 64; i += 4) {
+        wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
+        wprintw(win, "%-2d: %12d | %-2d: %12d | %-2d: %12d | %-2d: %12d\n",
+                addr + i, memaddr[addr + i],
+                addr + i + 1, memaddr[addr + i + 1],
+                addr + i + 2, memaddr[addr + i + 2],
+                addr + i + 3, memaddr[addr + i + 3]);
+    }
+    wmove(win,41+i/4, RIGHT_WINDOW_PADDING);
     wprintw(win, "=====================================================================================\n");
 }
 
@@ -151,6 +174,7 @@ void *threadOne(void *args) {
     print_display(getPixels());
     print_instructions(cpu->pgrm->pc / 4);
     printRegister(cpu->reg);
+    printMemory(cpu->shared->mem,mem_base_addr);
 
     box(win, 0, 0);
     refresh();
