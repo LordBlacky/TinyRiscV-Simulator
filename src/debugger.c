@@ -29,11 +29,17 @@ const int SLEEPTIME = 1000;
 const int CYCLES_PER_SLEEP = 1000;
 const int RES_X = 270;
 const int RES_Y = 70;
+
 int mem_base_addr = 0;
 
 int nextCommand = 0;
 int nextBreakpoint = 0;
 int justRun = 0;
+
+int showDisplay = 1;
+int showRegister = 1;
+int showMemory = 1;
+int showCode = 1;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -241,11 +247,10 @@ void *threadOne(void *args) {
   CPU *cpu = (CPU *)args;
 
   while (1) {
-
-    print_display(getPixels());
-    print_instructions(cpu->pgrm->pc / 4);
-    printRegister(cpu->reg);
-    printMemory(cpu->shared->mem, mem_base_addr);
+    showDisplay ? print_display(getPixels()) : NULL;
+    showCode ? print_instructions(cpu->pgrm->pc / 4) : NULL;
+    showRegister ? printRegister(cpu->reg) : NULL;
+    showMemory ? printMemory(cpu->shared->mem, mem_base_addr) : NULL;
 
     box(win, 0, 0);
     refresh();
@@ -283,6 +288,18 @@ void *threadTwo(void *args) {
       break;
     case 'm':
       scanf("%d",&mem_base_addr);
+      break;
+    case '1':
+      showDisplay = showDisplay ^ 1;
+      break;
+    case '2':
+      showCode = showCode ^ 1;
+      break;
+    case '3':
+      showRegister = showRegister ^ 1;
+      break;
+    case '4':
+      showMemory = showMemory ^ 1;
       break;
     };
   }
