@@ -291,6 +291,9 @@ void *threadTwo(void *args) {
     case 'p':
       exit(EXIT_SUCCESS);
       break;
+    case 'm':
+      scanf("%d",&mem_base_addr);
+      break;
     };
   }
 
