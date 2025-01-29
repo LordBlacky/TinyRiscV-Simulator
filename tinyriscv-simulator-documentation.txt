@@ -24,11 +24,8 @@ PROJECT: https://github.com/LordBlacky/TinyRiscV-Simulator
 TABLE OF CONTENTS |
 ------------------+
 
-  1. Supported Assembler Code (Compiler.py)
-
-
-
-
+  1. Usage
+  2. Supported Assembler Code (Compiler.py)
 
 
 
@@ -40,7 +37,13 @@ TABLE OF CONTENTS |
 
 
 ------------------------------------------+
-1. Supported Assembler Code (Compiler.py) |
+1. Usage                                  |
+------------------------------------------+
+see README.md for Usage
+
+
+------------------------------------------+
+2. Supported Assembler Code (Compiler.py) |
 ------------------------------------------+
 
 General syntax:

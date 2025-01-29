@@ -11,7 +11,7 @@ import socket
 
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_address = ('localhost',50000)
+server_address = ('localhost', 50000)
 
 while True:
     keys = 0
@@ -26,7 +26,7 @@ while True:
 
     if keyboard.is_pressed('esc'):
         break
-    
+
     client_socket.sendto(str(keys).encode(), server_address)
     data, server = client_socket.recvfrom(1024)
 
