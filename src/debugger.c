@@ -270,6 +270,7 @@ void *threadOne(void *args) {
     box(win, 0, 0);
     refresh();
     wrefresh(win);
+    usleep(10000);
   }
 
   return NULL;
@@ -357,11 +358,12 @@ void *startDebugger(void *args) {
       }
 
       while ((nextCommand == 0) && (nextBreakpoint == 0) && (justRun == 0)) {
+        usleep(100000);
       }
       runCommand(cpu);
       nextCommand = 0;
     }
-    // usleep(SLEEPTIME);
+    usleep(SLEEPTIME);
   }
 
   // ------------------------------------------
