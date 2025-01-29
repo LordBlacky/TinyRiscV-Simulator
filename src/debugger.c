@@ -40,6 +40,7 @@ int showDisplay = 1;
 int showRegister = 1;
 int showMemory = 1;
 int showCode = 1;
+int shouldClear = 0;
 
 // Array of pointers to hold lines
 char *lines[MAX_LINES];
@@ -255,6 +256,10 @@ void *threadOne(void *args) {
   CPU *cpu = (CPU *)args;
 
   while (1) {
+    if (shouldClear) {
+      wclear(win);
+      shouldClear = 0;
+    }
     showDisplay ? print_display(getPixels()) : NULL;
     showCode ? print_instructions(cpu->pgrm->pc / 4) : NULL;
     showRegister ? printRegister(cpu->reg) : NULL;
@@ -301,15 +306,19 @@ void *threadTwo(void *args) {
       break;
     case '1':
       showDisplay = showDisplay ^ 1;
+        shouldClear++;
       break;
     case '2':
       showCode = showCode ^ 1;
+        shouldClear++;
       break;
     case '3':
       showRegister = showRegister ^ 1;
+        shouldClear++;
       break;
     case '4':
       showMemory = showMemory ^ 1;
+        shouldClear++;
       break;
     };
   }
