@@ -20,7 +20,6 @@
 
 #define MAX_LINES 1024           // Maximum number of lines
 #define MAX_LINE_LENGTH 1024     // Maximum length of a single line
-#define RIGHT_WINDOW_PADDING 136 // Distance to the right side debug info
 #define BOTTOM_WINDOW_PADDING 70
 #define INSTRUCTION_LINES 10 // Number of instructions shown when debugging
 #define NUMBER_OF_INSTRUCTIONS 20
@@ -118,7 +117,7 @@ void printMemory(Memory *mem, int addr) {
             (uint8_t)memaddr[addr + i + 3]);
   }
   next_panel_y += i / 4;
-  wmove(win, next_panel_y, next_panel_x);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",
           (uint8_t)mem->GPIO_IN, (uint8_t)mem->GPIO_OUT, (uint32_t)mem->DISPLAY,
           (uint32_t)mem->I2C_REST);
@@ -287,11 +286,11 @@ void *threadTwo(void *args) {
     case 'n':
       nextCommand = 1;
       break;
-    case 'u':
-      mem_base_addr++;
+    case 'j':
+      mem_base_addr+=4;
       break;
-    case 'i':
-      mem_base_addr--;
+    case 'k':
+      mem_base_addr-= 4;
       break;
     case 'b':
       nextBreakpoint = 1;
