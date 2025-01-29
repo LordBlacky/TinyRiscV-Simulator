@@ -70,47 +70,47 @@ void print_instructions(int line) {
     wprintw(win, "%zu: %s", i + 1, lines[i]);
   }
 
-  next_panel_y += 10;
+  next_panel_y += NUMBER_OF_INSTRUCTIONS;
 }
 
 void printRegister(Register *reg) {
   wmove(win, next_panel_y++, next_panel_x); // Adjust the position as needed
   wprintw(win, "==============================================================="
                "======================\n");
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "CURRENT REGISTER VIEW\n");
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "---------------------------------------------------------------"
                "----------------------\n");
 
   int i = 0;
   for (; i < reg->size; i += 4) {
-    wmove(win, next_panel_y + i / 4, RIGHT_WINDOW_PADDING);
+    wmove(win, next_panel_y + i / 4, next_panel_x);
     wprintw(win,
             "x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x | x%-2d: 0x%12x\n",
             i, (uint32_t)reg->data[i], i + 1, (uint32_t)reg->data[i + 1], i + 2,
             (uint32_t)reg->data[i + 2], i + 3, (uint32_t)reg->data[i + 3]);
   }
   next_panel_y += i / 4;
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "==============================================================="
                "======================\n");
 }
 
 void printMemory(Memory *mem, int addr) {
   int8_t *memaddr = (int8_t *)(mem->data);
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING); // Adjust the position as needed
+  wmove(win, next_panel_y++, next_panel_x); // Adjust the position as needed
   wprintw(win, "==============================================================="
                "==========================\n");
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "CURRENT MEMORY VIEW (LITTLE ENDIAN!)\n");
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "---------------------------------------------------------------"
                "--------------------------\n");
 
   int i = 0;
   for (; i < 64; i += 4) {
-    wmove(win, next_panel_y + i / 4, RIGHT_WINDOW_PADDING);
+    wmove(win, next_panel_y + i / 4, next_panel_x);
     wprintw(win, "%-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x | %-4d: 0x%12x\n",
             addr + i, (uint8_t)memaddr[addr + i], addr + i + 1,
             (uint8_t)memaddr[addr + i + 1], addr + i + 2,
@@ -118,11 +118,11 @@ void printMemory(Memory *mem, int addr) {
             (uint8_t)memaddr[addr + i + 3]);
   }
   next_panel_y += i / 4;
-  wmove(win, next_panel_y, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y, next_panel_x);
   wprintw(win, "GPIO-IN: 0x%x GPIO-OUT: 0x%x I2C-DISPLAY: 0x%x I2C-REST: 0x%x",
           (uint8_t)mem->GPIO_IN, (uint8_t)mem->GPIO_OUT, (uint32_t)mem->DISPLAY,
           (uint32_t)mem->I2C_REST);
-  wmove(win, next_panel_y++, RIGHT_WINDOW_PADDING);
+  wmove(win, next_panel_y++, next_panel_x);
   wprintw(win, "==============================================================="
                "==========================\n");
 }
