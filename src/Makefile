@@ -20,7 +20,9 @@ clean:
 	touch simulator
 	touch compiled.txt
 	touch debugger_info.txt
+	touch breakpoint_info.txt
 	rm simulator
 	rm compiled.txt
 	rm debugger_info.txt
+	rm breakpoint_info.txt
 
