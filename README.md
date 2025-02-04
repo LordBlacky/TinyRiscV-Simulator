@@ -11,7 +11,7 @@ first, clone the repo to your machine.
 - this will generate some files for the simulator, including `debug_info.txt`, that is the text that will also be displayed in the simulator, you might want to open in in a text editor as well to look at arbitrary positions in code, since the simulator will only print the current and couple afterwords lines.
 - Now run: `make simulator`
   this will compile and run the simulator, make sure you zoom out far enough (Ctrl-) that everything fits on the screen. Your terminal should be able to display about 70 chars vertically.
-- Also, note that our simulator essentially uses the [harvard architecture](https://en.wikipedia.org/wiki/Harvard_architecture). So you can not read or write the instruction during runtime 
+- Also, note that our simulator essentially uses the [harvard architecture](https://en.wikipedia.org/wiki/Harvard_architecture). So you can not read or write to the instructions during runtime. 
 
 ## 2 Runtime
 Use these buttons to controll the simulator:
