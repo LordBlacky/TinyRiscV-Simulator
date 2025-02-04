@@ -21,6 +21,8 @@ Use these buttons to controll the simulator:
 | n:     | run next instruction                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | r:     | run complete complete program, ignoring breakpoints     
 
+|        |
+
 | q:     | reset CPU: (reset register, reset memory, reset pc)
 
 |        |                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
