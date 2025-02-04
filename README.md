@@ -1,5 +1,5 @@
 # TinyRiscV-Simulator
-TinyRiscV-Simulator written in C
+TinyRiscV-Simulator written in C. This project aims to provide a simple, relativly easily expandable simulator for TinyRiscV Assembly, that can also run in real time. We also provide features for debugging. That includes setting breakpoints, going step by step through the instructions, looking through the memory and registers, giving inputs to the gpio via the keyboard (or python), seeing gpio output, and simulatin an ascii art display, connected via i2c.
 
 # Usage
 first, clone the repo to your machine.
