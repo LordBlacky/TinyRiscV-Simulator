@@ -73,4 +73,6 @@ typedef struct IOargs {
 
 void runCommand (CPU *cpu);
 
+void resetCPU(CPU *cpu);
+
 #endif

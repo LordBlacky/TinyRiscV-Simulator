@@ -320,6 +320,8 @@ void *threadTwo(void *args) {
       showMemory = showMemory ^ 1;
         shouldClear++;
       break;
+    case 'q':
+        resetCPU(cpu);
     };
   }
 

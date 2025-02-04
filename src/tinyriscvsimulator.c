@@ -750,6 +750,16 @@ void runSimulation (int memsize, int pgrmsize, int lifetime, char *file, int bas
 
 }
 
+void resetCPU (CPU *cpu) {
+
+	freeMemory(cpu->shared->mem);
+	freeRegister(cpu->reg);
+	cpu->shared->mem = createMemory(10000000);
+	cpu->reg = createRegister(32);
+	cpu->pgrm->pc = 0;
+
+}
+
 int main (int argc, char **argv) {
 
 	runSimulation(10000000,10000000,-1,argv[1],1000, atoi(argv[2]));
