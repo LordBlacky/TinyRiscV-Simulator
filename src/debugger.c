@@ -322,6 +322,9 @@ void *threadTwo(void *args) {
       break;
     case 'q':
         resetCPU(cpu);
+        nextCommand = 0;
+        nextBreakpoint = 0;
+        justRun = 0;
     };
   }
 
