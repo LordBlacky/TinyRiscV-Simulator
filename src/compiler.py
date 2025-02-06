@@ -110,9 +110,10 @@ def expand_macros(input_file, output_file):
     while not all_macros_expanded:
         all_macros_expanded = True
         for i in range(count):
-            m = re.match(r"^\s*\w+", lines[i])
+            # m = re.match(r"^\s*\w+", lines[i])
+            m = re.search(r"(^|\n)\s*(\w+)")
             if m is not None:
-                if not macros.__contains__(m.group(0).strip()):
+                if not macros.__contains__(m.group(2).strip()):
                     print(m.group(0), " is not a macro")
                     continue
 
