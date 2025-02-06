@@ -201,7 +201,8 @@ alias_dict = {}
 def get_arg_id(arg: str, labels: dict, current_line):
     # check if its a register
     alias_arg = re.match(r"([^\)]*)\)?", arg).group(1)
-    # print("alias arg: ", alias_arg, " normal arg: ", arg)
+    if alias_arg.lower() == "fp":  # check for the extra alias Exception
+        alias_arg = "s0"
     if (alias_arg is not None and alias_arg in alias_dict):
         return int(alias_dict[alias_arg])
 
