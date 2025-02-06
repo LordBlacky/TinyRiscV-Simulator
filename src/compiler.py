@@ -7,7 +7,7 @@ instructions_list = [
     "ADDI", "ANDI", "ORI", "XORI", "SLTI", "SLTIU", "SRAI", "SRLI", "LUI", "AUIPC",
     "LW", "SW", "BEQ", "BNE", "BLT", "BGE", "BLTU", "BGEU", "JAL", "JALR", "FLAG",
     "NOP", "LI", "LA", "MV", "NOT", "NEG", "SEQZ", "SNEZ", "SLTZ", "SGTZ", "BEQZ", "BNEZ", "BLEZ", "BGEZ", "BLTZ", "BGTZ",
-    "BGT", "BLE", "BGTU", "BLEU", "J", "JR", "RET", "CALL","LEAVE"]
+    "BGT", "BLE", "BGTU", "BLEU", "J", "JR", "RET", "CALL", "LEAVE"]
 
 instructions_dict = {}
 
@@ -106,18 +106,23 @@ def expand_macros(input_file, output_file):
                 lines[i] = ""
 
     # expand macros
-    for i in range(count):
-        m = re.match(r"^\s*\w+", lines[i])
-        if m is not None:
-            if not macros.__contains__(m.group(0).strip()):
-                print(m.group(0), " is not a macro")
-                continue
+    all_macros_expanded = False
+    while not all_macros_expanded:
+        all_macros_expanded = True
+        for i in range(count):
+            m = re.match(r"^\s*\w+", lines[i])
+            if m is not None:
+                if not macros.__contains__(m.group(0).strip()):
+                    print(m.group(0), " is not a macro")
+                    continue
 
-            s = lines[i].strip()
-            s = re.sub(m.group(0), "", s)
-            args = re.split(r"\s*,\s*|\s+", s)
+                all_macros_expanded = False
+                s = lines[i].strip()
+                s = re.sub(m.group(0), "", s)
+                args = re.split(r"\s*,\s*|\s+", s)
 
-            lines[i] = macros[m.group(0).strip()].get_replaced_text(args[1:])
+                lines[i] = macros[m.group(
+                    0).strip()].get_replaced_text(args[1:])
 
     # write File
     with open(output_file, 'w') as outfile:
