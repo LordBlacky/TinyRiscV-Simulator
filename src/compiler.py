@@ -66,6 +66,9 @@ def expand_macros(input_file, output_file):
 
             return to_insert
 
+        def __str__(self):
+            return f"Macro Name: {self.name}\tContent:\n{self.text}"
+
     lines = []
     with open(input_file, 'r') as infile:
         lines = infile.readlines()
@@ -106,24 +109,31 @@ def expand_macros(input_file, output_file):
                 lines[i] = ""
 
     # expand macros
+    for k in macros.keys():
+        print(macros[k])
     all_macros_expanded = False
     while not all_macros_expanded:
         all_macros_expanded = True
         for i in range(count):
-            # m = re.match(r"^\s*\w+", lines[i])
-            m = re.search(r"(^|\n)\s*(\w+)")
-            if m is not None:
-                if not macros.__contains__(m.group(2).strip()):
-                    print(m.group(0), " is not a macro")
-                    continue
+            multiline = lines[i].split("\n")
+            for l in range(len(multiline)):
+                m = re.match(r"^\s*\w+", multiline[l])
+                if m is not None:
+                    if not macros.__contains__(m.group(0).strip()):
+                        continue
 
-                all_macros_expanded = False
-                s = lines[i].strip()
-                s = re.sub(m.group(0), "", s)
-                args = re.split(r"\s*,\s*|\s+", s)
+                    all_macros_expanded = False
+                    s = multiline[l].strip()
+                    s = re.sub(m.group(0), "", s)
+                    args = re.split(r"\s*,\s*|\s+", s)
 
-                lines[i] = macros[m.group(
-                    0).strip()].get_replaced_text(args[1:])
+                    multiline[l] = macros[m.group(
+                        0).strip()].get_replaced_text(args[1:])
+            # concatenate multifiles back into lines
+            back_in = ""
+            for l in range(len(multiline)-1):
+                back_in += multiline[l] + "\n"
+            lines[i] = back_in + multiline[len(multiline)-1]
 
     # write File
     with open(output_file, 'w') as outfile:
