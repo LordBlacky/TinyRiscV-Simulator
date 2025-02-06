@@ -467,6 +467,11 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 		case CALL:
 			executeExpansion(JAL, 1, rd, 0, reg, mem, pgrm);
 			break;
+		case LEAVE:
+			executeExpansion(ADDI, 2, 8, 0, reg, mem, pgrm);
+			executeExpansion(LW, 8, 2, 0, reg, mem, pgrm);
+			executeExpansion(ADDI, 2, 2, 4, reg, mem, pgrm);
+			break;
 		default:
 			break;
 

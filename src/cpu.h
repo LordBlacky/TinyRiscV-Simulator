@@ -39,7 +39,7 @@ typedef enum CommandType {
 	LW,SW,BEQ,BNE,BLT,BGE,BLTU,BGEU,JAL,JALR,FLAG,
 	//pseudo instructions
 	NOP,LI,LA,MV,NOT,NEG,SEQZ,SNEZ,SLTZ,SGTZ,BEQZ,BNEZ,BLEZ,BGEZ,BLTZ,BGTZ,
-	BGT,BLE, BGTU, BLEU, J,JR,RET,CALL
+	BGT,BLE, BGTU, BLEU, J,JR,RET,CALL,LEAVE
 } CommandType;
 
 typedef struct Command {
