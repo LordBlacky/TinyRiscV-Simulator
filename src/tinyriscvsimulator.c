@@ -397,6 +397,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 
 		//also add supported pseudo instruction
 		case NOP:
+			pgrm->pc += 4;
 			break;
 		case LI:
 			executeExpansion(ADDI, rd, 0, rs1, reg, mem, pgrm);
