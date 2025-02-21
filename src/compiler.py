@@ -35,7 +35,8 @@ def concatenate_files(output_file, *input_files):
                 lines = infile.readlines()
                 start_line = current_line
                 outfile.writelines(lines)
-                current_line += len(lines)
+                outfile.writelines("\n")
+                current_line += len(lines) + 1
                 end_line = current_line - 1
 
                 # Append the start and end line numbers for the current file
