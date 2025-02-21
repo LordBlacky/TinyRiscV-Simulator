@@ -157,6 +157,7 @@ def compile(input_file, output_file):
         s = re.sub(r"\s*;.*$", "", s)
         s = re.sub(r"\s*#.*$", "", s)
         s = re.sub(r"\s*\..*$", "", s)
+        s = re.sub(r"\s*//.*$", "", s)
         lines[i] = s
 
     # determine _start line
@@ -179,7 +180,7 @@ def compile(input_file, output_file):
     # print(lines)
     # iterate through lines and replace everything with ids
     for i in range(count):
-        parts = re.split(r",? |,|\(", lines[i].strip())
+        parts = re.split(r",? +|,|\(", lines[i].strip())
         # if bracket syntax is used (e.g "jalr x1 0(x2)"):
         # swap second and third argument
         if (re.search(r"\d\(.+\)", lines[i])):
@@ -228,7 +229,7 @@ def get_arg_id(arg: str, labels: dict, current_line):
         return int(r.group(1))
 
     # check if its a immediate
-    if (re.match(r"^-?\d+$", arg)):
+    if (re.match(r"^[+-]?\d+$", arg)):
         return int(arg)
     elif (re.match(r"0x[0-9a-fA-F]+", arg)):  # number is hex Value
         return int(arg.lower(), 0)
