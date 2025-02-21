@@ -18,7 +18,7 @@
 #include "cpu.h"
 #include "display.h"
 
-#define MAX_LINES 1024           // Maximum number of lines
+#define MAX_LINES 10024           // Maximum number of lines
 #define MAX_LINE_LENGTH 1024     // Maximum length of a single line
 #define BOTTOM_WINDOW_PADDING 70
 #define INSTRUCTION_LINES 10 // Number of instructions shown when debugging
