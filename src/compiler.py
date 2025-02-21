@@ -232,6 +232,8 @@ def get_arg_id(arg: str, labels: dict, current_line):
         return int(arg)
     elif (re.match(r"0x[0-9a-fA-F]+", arg)):  # number is hex Value
         return int(arg.lower(), 0)
+    elif (re.match(r"0b[0-1]+", arg)):  # number is binary value
+        return int(arg.lower(), 0)
 
         # check if its a label
     if (labels.__contains__(arg)):
