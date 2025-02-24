@@ -472,6 +472,7 @@ void executeCommand (Command cmd, Register *reg, Memory *mem, Program *pgrm) {
 			executeExpansion(ADDI, 2, 8, 0, reg, mem, pgrm);
 			executeExpansion(LW, 8, 2, 0, reg, mem, pgrm);
 			executeExpansion(ADDI, 2, 2, 4, reg, mem, pgrm);
+			pgrm->pc -= 8;
 			break;
 		default:
 			break;
